@@ -4,6 +4,7 @@ from django_quickbooks.settings import qbwc_settings
 from django_quickbooks.utils import import_callable
 
 HIGHEST_SUPPORTING_QBWC_VERSION = '2.2.0.34'
+default_app_config = 'django_quickbooks.apps.DjangoQuickbooksConfig'
 
 
 def get_session_manager():

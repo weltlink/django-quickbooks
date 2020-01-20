@@ -94,7 +94,7 @@ class QBTaskMixin(models.Model):
 
     def get_request(self):
         obj_class = import_object_cls(self.qb_resource)
-        service = obj_class.get_service()
+        service = obj_class.get_service()()
         obj = self.content_object if self.content_type and self.object_id else None
 
         if self.qb_operation == QUICKBOOKS_ENUMS.OPP_QR:
