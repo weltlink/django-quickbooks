@@ -1,5 +1,5 @@
 from django_quickbooks import QUICKBOOKS_ENUMS
-from django_quickbooks.services.service import Service
+from django_quickbooks.services.base import Service
 
 
 class CustomerService(Service):

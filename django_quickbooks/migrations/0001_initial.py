@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
                 ('id', models.UUIDField(default=uuid.uuid1, editable=False, primary_key=True, serialize=False, verbose_name='Ticket for QBWC session')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('ended_at', models.DateTimeField(null=True)),
-                ('realm', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sessions', to='quickbooks_desktop.Realm')),
+                ('realm', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sessions', to='django_quickbooks.Realm')),
             ],
             options={
                 'abstract': False,

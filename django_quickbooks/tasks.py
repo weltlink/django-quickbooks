@@ -1,6 +1,6 @@
 from celery.task import task
 
-from django_quickbooks.processors import RequestBuilder
+from django_quickbooks.request_builder import RequestBuilder
 
 
 @task

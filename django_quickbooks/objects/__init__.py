@@ -5,7 +5,7 @@ from django_quickbooks.objects.customer import \
 
 from django_quickbooks.objects.invoice import \
     BillAddress, \
-    Item, \
+    ItemService, \
     InvoiceItem, \
     InvoiceLine, \
     Invoice

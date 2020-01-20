@@ -42,7 +42,7 @@ class QUICKBOOKS_ENUMS:
     RESOURCE_VENDOR = 'Vendor'
     RESOURCE_INVOICE = 'Invoice'
     RESOURCE_BILL = 'Bill'
-    RESOURCE_ITEM = 'Item'
+    RESOURCE_ITEM_SERVICE = 'ItemService'
 
 
 class QBXML_RESPONSE_STATUS_CODES:

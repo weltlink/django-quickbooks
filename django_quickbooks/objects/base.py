@@ -82,6 +82,8 @@ class BaseObject(ABC):
         for field in list(lxml_obj):
             if field.tag in cls.fields:
                 setattr(obj, field.tag, to_internal_value(field, cls.fields[field.tag]['validator']['type']))
+            elif field.tag == 'ParentRef':
+                setattr(obj, 'Parent', cls.from_lxml(field))
 
         return obj
 

@@ -1,4 +1,4 @@
-from django_quickbooks.session_manager import RabbitMQManager
+from django_quickbooks.queue_manager import RabbitMQManager
 
 
 class RequestBuilder(RabbitMQManager):

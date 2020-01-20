@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('quickbooks_desktop', '0001_initial'),
+        ('django_quickbooks', '0001_initial'),
     ]
 
     operations = [

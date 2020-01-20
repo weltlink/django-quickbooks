@@ -1,5 +1,4 @@
 from django_quickbooks.processors.base import \
-    RequestBuilder, \
     ResponseProcessor
 
 from django_quickbooks.processors.customer import \
@@ -11,3 +10,6 @@ from django_quickbooks.processors.invoice import \
     InvoiceQueryResponseProcessor, \
     InvoiceAddResponseProcessor, \
     InvoiceModResponseProcessor
+
+from django_quickbooks.processors.item_service import \
+    ItemServiceQueryResponseProcessor

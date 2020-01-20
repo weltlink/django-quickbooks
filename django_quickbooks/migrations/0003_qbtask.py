@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('contenttypes', '0002_remove_content_type_name'),
-        ('quickbooks_desktop', '0002_auto_20200103_0801'),
+        ('django_quickbooks', '0002_auto_20200103_0801'),
     ]
 
     operations = [
@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('object_id', models.CharField(max_length=50, null=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('content_type', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.ContentType')),
-                ('realm', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='qb_tasks', to='quickbooks_desktop.Realm')),
+                ('realm', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='qb_tasks', to='django_quickbooks.Realm')),
             ],
             options={
                 'abstract': False,

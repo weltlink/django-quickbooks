@@ -9,17 +9,20 @@ DEFAULTS = {
     'MINIMUM_RUN_EVERY_NSECONDS': 30,
     'MINIMUM_RUN_EVERY_NMINUTES': 15,
 
-    'SESSION_MANAGER_CLASS': 'quickbooks_desktop.session.QWCSessionManager',
+    'SESSION_MANAGER_CLASS': 'django_quickbooks.session_manager.SessionManager',
 
-    'REALM_MODEL_CLASS': 'quickbooks_desktop.models.Realm',
-    'REALM_SESSION_MODEL_CLASS': 'quickbooks_desktop.models.RealmSession',
-    'QB_TASK_MODEL_CLASS': 'quickbooks_desktop.models.QBTask',
+    'REALM_MODEL_CLASS': 'django_quickbooks.models.Realm',
+    'REALM_SESSION_MODEL_CLASS': 'django_quickbooks.models.RealmSession',
+    'QB_TASK_MODEL_CLASS': 'django_quickbooks.models.QBTask',
 
     'RESPONSE_PROCESSORS': (
-        'quickbooks_desktop.handlers.CustomerQueryResponseProcessor',
-        'quickbooks_desktop.handlers.CustomerAddResponseProcessor',
-        'quickbooks_desktop.handlers.InvoiceQueryResponseProcessor',
-        'quickbooks_desktop.handlers.InvoiceAddResponseProcessor',
+        'django_quickbooks.processors.CustomerQueryResponseProcessor',
+        'django_quickbooks.processors.CustomerModResponseProcessor',
+        'django_quickbooks.processors.CustomerAddResponseProcessor',
+        'django_quickbooks.processors.InvoiceQueryResponseProcessor',
+        'django_quickbooks.processors.InvoiceAddResponseProcessor',
+        'django_quickbooks.processors.InvoiceModResponseProcessor',
+        'django_quickbooks.processors.ItemServiceQueryResponseProcessor',
     ),
 
     'RABBITMQ_DEFAULT_HOST': 'localhost',
@@ -27,11 +30,11 @@ DEFAULTS = {
     'RABBITMQ_DEFAULT_PASS': 'quickbooks',
     'RABBITMQ_DEFAULT_VHOST': 'quickbooks',
 
-    'APP_URL': 'http://192.168.100.234:8000/integrations/quickbooks-desktop/',
-    'APP_SUPPORT': 'http://192.168.100.234:8000/integrations/quickbooks-desktop/support/',
+    'APP_URL': 'http://localhost:8000/quickbooks-desktop/',
+    'APP_SUPPORT': 'http://localhost:8000/quickbooks-desktop/support/',
     'APP_ID': '',
-    'APP_NAME': 'Weltlink TMS',
-    'APP_DESCRIPTION': 'Weltlink TMS Description',
+    'APP_NAME': 'Some App',
+    'APP_DESCRIPTION': 'Some App Description',
     'QB_TYPE': 'QBFS',
     'OWNER_ID': '{1ee58da6-3051-11ea-b499-9cda3ea7afc1}',
 
@@ -42,10 +45,11 @@ DEFAULTS = {
 }
 
 IMPORT_STRINGS = (
+    'RESPONSE_PROCESSORS',
     'SESSION_MANAGER_CLASS',
     'REALM_MODEL_CLASS',
     'REALM_SESSION_MODEL_CLASS',
-    'RESPONSE_PROCESSORS'
+    'QB_TASK_MODEL_CLASS',
 )
 
 

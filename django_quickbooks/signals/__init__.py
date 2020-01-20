@@ -17,5 +17,4 @@ qbd_first_time_connected = Signal(providing_args=["schema_name"])
 
 from django_quickbooks.signals.customer import *
 from django_quickbooks.signals.invoice import *
-from django_quickbooks.signals.extra import *
 from django_quickbooks.signals.qb_task import *
