@@ -47,7 +47,7 @@ class SessionManager(BaseSessionManager, RabbitMQManager):
             except QBXMLParseError:
                 return -1
             except QBXMLStatusError:
-                pass
+                return -1
 
         self._continue_iterative_response(ticket, response)
 
