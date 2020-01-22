@@ -26,6 +26,11 @@ class Service:
             opp_type=QUICKBOOKS_ENUMS.OPP_MOD, ref_fields=self.ref_fields, change_fields=self.mod_fields, complex_fields=self.complex_fields))
         return self._prepare_request(xml)
 
+    def _void(self, resource, object):
+        xml = ''
+        xml += xml_setter(resource + QUICKBOOKS_ENUMS.OPP_VOID + 'Rq', object.as_xml(opp_type=QUICKBOOKS_ENUMS.OPP_VOID))
+        return self._prepare_request(xml)
+
     def _all(self, resource):
         xml = xml_setter('MaxReturned', 100)
         xml = xml_setter(resource + QUICKBOOKS_ENUMS.OPP_QR + 'Rq', xml, metaData='NoMetaData', iterator='Start')

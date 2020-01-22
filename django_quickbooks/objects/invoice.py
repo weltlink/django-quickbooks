@@ -1,3 +1,4 @@
+from django_quickbooks import QUICKBOOKS_ENUMS
 from django_quickbooks.objects.base import BaseObject
 from django_quickbooks.validators import SchemeValidator
 
@@ -62,3 +63,19 @@ class Invoice(BaseObject):
     def get_service():
         from django_quickbooks.services.invoice import InvoiceService
         return InvoiceService
+
+
+class Txn(BaseObject):
+    fields = dict(
+        TxnID=dict(validator=dict(type=SchemeValidator.IDTYPE)),
+        TxnVoidType=dict(validator=dict(type=SchemeValidator.STRTYPE)),
+    )
+
+    def as_xml(self, class_name=None, indent=0, opp_type=QUICKBOOKS_ENUMS.OPP_ADD,
+               version=QUICKBOOKS_ENUMS.VERSION_13, **kwargs):
+        xml = super(Txn, self).as_xml(class_name, indent, opp_type, version,  **kwargs)
+        if opp_type == QUICKBOOKS_ENUMS.OPP_VOID:
+            return xml\
+                .replace(f'<{__class__.__name__}{QUICKBOOKS_ENUMS.OPP_VOID}>', '')\
+                .replace(f'</{__class__.__name__}{QUICKBOOKS_ENUMS.OPP_VOID}>', '')
+        return xml

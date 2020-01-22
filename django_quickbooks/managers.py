@@ -25,5 +25,5 @@ class RealmSessionQuerySet(models.QuerySet):
         self.filter(realm=realm, ended_at__isnull=True).update(ended_at=timezone.now())
 
 
-class QBTaskQuerySet(models.QuerySet):
+class QBDTaskQuerySet(models.QuerySet):
     pass

@@ -1,13 +1,13 @@
 from lxml import etree
 
-from django_quickbooks import get_realm_session_model, get_realm_model, get_qb_task_model
+from django_quickbooks import get_realm_session_model, get_realm_model, get_qbd_task_model
 from django_quickbooks.core.session_manager import BaseSessionManager
 from django_quickbooks.exceptions import QBXMLParseError, QBXMLStatusError
 from django_quickbooks.queue_manager import RabbitMQManager
 
 Realm = get_realm_model()
 RealmSession = get_realm_session_model()
-QBTask = get_qb_task_model()
+QBDTask = get_qbd_task_model()
 
 
 def _get_realm(ticket):
@@ -26,7 +26,7 @@ class SessionManager(BaseSessionManager, RabbitMQManager):
         return RealmSession.objects.is_active(realm)
 
     def add_new_jobs(self, realm):
-        queryset = QBTask.objects.filter(realm=realm).order_by('created_at')
+        queryset = QBDTask.objects.filter(realm=realm).order_by('created_at')
         for qb_task in queryset:
             self.publish_message(qb_task.get_request(), str(realm.id))
         queryset.delete()

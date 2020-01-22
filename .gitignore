@@ -128,3 +128,5 @@ dmypy.json
 .idea/
 
 requirements*.txt
+project/
+manage.py

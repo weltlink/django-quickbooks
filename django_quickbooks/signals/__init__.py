@@ -1,6 +1,6 @@
 from django.dispatch import Signal
 
-qb_task_create = Signal(providing_args=[
+qbd_task_create = Signal(providing_args=[
     "qb_operation",
     "qb_resource",
     "object_id",
@@ -17,4 +17,4 @@ qbd_first_time_connected = Signal(providing_args=["schema_name"])
 
 from django_quickbooks.signals.customer import *
 from django_quickbooks.signals.invoice import *
-from django_quickbooks.signals.qb_task import *
+from django_quickbooks.signals.qbd_task import *

@@ -29,6 +29,7 @@ class QUICKBOOKS_ENUMS:
     OPP_MOD = 'Mod'
     OPP_QR = 'Query'
     OPP_DEL = 'Del'
+    OPP_VOID = 'Void'
 
     OPERATIONS = (
         (OPP_ADD, 'Add'),
@@ -44,6 +45,7 @@ class QUICKBOOKS_ENUMS:
     RESOURCE_INVOICE = 'Invoice'
     RESOURCE_BILL = 'Bill'
     RESOURCE_ITEM_SERVICE = 'ItemService'
+    RESOURCE_TXN = 'Txn'
 
 
 class QBXML_RESPONSE_STATUS_CODES:
@@ -79,5 +81,5 @@ def get_realm_session_model():
     return qbwc_settings.REALM_SESSION_MODEL_CLASS
 
 
-def get_qb_task_model():
-    return qbwc_settings.QB_TASK_MODEL_CLASS
+def get_qbd_task_model():
+    return qbwc_settings.QBD_TASK_MODEL_CLASS

@@ -1,6 +1,5 @@
 from importlib import import_module
 
-import six
 from django.conf import settings
 
 DEFAULTS = {
@@ -13,7 +12,7 @@ DEFAULTS = {
 
     'REALM_MODEL_CLASS': 'django_quickbooks.models.Realm',
     'REALM_SESSION_MODEL_CLASS': 'django_quickbooks.models.RealmSession',
-    'QB_TASK_MODEL_CLASS': 'django_quickbooks.models.QBTask',
+    'QBD_TASK_MODEL_CLASS': 'django_quickbooks.models.QBDTask',
 
     'RESPONSE_PROCESSORS': (
         'django_quickbooks.processors.CustomerQueryResponseProcessor',
@@ -49,7 +48,7 @@ IMPORT_STRINGS = (
     'SESSION_MANAGER_CLASS',
     'REALM_MODEL_CLASS',
     'REALM_SESSION_MODEL_CLASS',
-    'QB_TASK_MODEL_CLASS',
+    'QBD_TASK_MODEL_CLASS',
 )
 
 
@@ -60,7 +59,7 @@ def perform_import(val, setting_name):
     """
     if val is None:
         return None
-    elif isinstance(val, six.string_types):
+    elif isinstance(val, str):
         return import_from_string(val, setting_name)
     elif isinstance(val, (list, tuple)):
         return [import_from_string(item, setting_name) for item in val]

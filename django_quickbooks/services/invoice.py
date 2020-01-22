@@ -1,4 +1,5 @@
 from django_quickbooks import QUICKBOOKS_ENUMS
+from django_quickbooks.objects.invoice import Txn
 from django_quickbooks.services.base import Service
 
 
@@ -16,6 +17,11 @@ class InvoiceService(Service):
 
     def all(self):
         return self._all(QUICKBOOKS_ENUMS.RESOURCE_INVOICE)
+
+    def void(self, object):
+        return self._void(
+            QUICKBOOKS_ENUMS.RESOURCE_TXN, Txn(TxnID=object.TxnID, TxnVoidType=QUICKBOOKS_ENUMS.RESOURCE_INVOICE)
+        )
 
     def find_by_id(self, id):
         return self._find_by_id(QUICKBOOKS_ENUMS.RESOURCE_INVOICE, id)

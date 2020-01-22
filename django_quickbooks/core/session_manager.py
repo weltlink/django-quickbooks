@@ -1,10 +1,10 @@
 from abc import abstractmethod
 
-from django_quickbooks import get_realm_session_model, get_realm_model, get_qb_task_model
+from django_quickbooks import get_realm_session_model, get_realm_model, get_qbd_task_model
 
 Realm = get_realm_model()
 RealmSession = get_realm_session_model()
-QBTask = get_qb_task_model()
+QBDTask = get_qbd_task_model()
 
 
 class BaseSessionManager:

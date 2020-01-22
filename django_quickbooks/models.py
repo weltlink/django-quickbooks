@@ -4,12 +4,11 @@ from uuid import uuid4, uuid1
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.db import models, IntegrityError
+from django.db import models
 from lxml import etree
-from psycopg2.errorcodes import UNIQUE_VIOLATION
 
 from django_quickbooks import qbwc_settings, QUICKBOOKS_ENUMS
-from django_quickbooks.managers import RealmQuerySet, RealmSessionQuerySet, QBTaskQuerySet
+from django_quickbooks.managers import RealmQuerySet, RealmSessionQuerySet, QBDTaskQuerySet
 from django_quickbooks.objects import import_object_cls
 
 
@@ -49,16 +48,6 @@ class RealmSessionMixin(models.Model):
 
     objects = RealmSessionQuerySet.as_manager()
 
-    def save(self, *args, **kwargs):
-        while True:
-            try:
-                obj = super().save(*args, **kwargs)
-            except IntegrityError as e:
-                if e.__cause__.pgcode == UNIQUE_VIOLATION:
-                    continue
-                raise
-            return obj
-
     class Meta:
         abstract = True
 
@@ -78,7 +67,7 @@ class RealmSession(RealmSessionMixin):
         abstract = False
 
 
-class QBTaskMixin(models.Model):
+class QBDTaskMixin(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     qb_operation = models.CharField(max_length=25)
     qb_resource = models.CharField(max_length=50)
@@ -90,7 +79,7 @@ class QBTaskMixin(models.Model):
     class Meta:
         abstract = True
 
-    objects = QBTaskQuerySet.as_manager()
+    objects = QBDTaskQuerySet.as_manager()
 
     def get_request(self):
         obj_class = import_object_cls(self.qb_resource)
@@ -107,11 +96,13 @@ class QBTaskMixin(models.Model):
             return service.add(obj.to_qbd_obj())
         elif self.qb_operation == QUICKBOOKS_ENUMS.OPP_DEL:
             return service.delete(obj.to_qbd_obj())
+        elif self.qb_operation == QUICKBOOKS_ENUMS.OPP_VOID:
+            return service.void(obj.to_qbd_obj())
         else:
             return None
 
 
-class QBTask(QBTaskMixin):
+class QBDTask(QBDTaskMixin):
     realm = models.ForeignKey(Realm, on_delete=models.CASCADE, related_name='qb_tasks')
 
     class Meta:
