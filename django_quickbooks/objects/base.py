@@ -2,6 +2,7 @@ from abc import ABC
 
 from django_quickbooks import QUICKBOOKS_ENUMS
 from django_quickbooks.exceptions import ValidationError
+from django_quickbooks.objects import import_object_cls
 from django_quickbooks.utils import xml_setter
 from django_quickbooks.validators import SchemeValidator, is_primitive, is_list
 
@@ -21,6 +22,10 @@ class BaseObject(ABC):
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
+
+        for field_name, options in self.fields.items():
+            if not hasattr(self, field_name):
+                setattr(self, field_name, None)
 
     def as_xml(self, class_name=None, indent=0, opp_type=QUICKBOOKS_ENUMS.OPP_ADD,
                version=QUICKBOOKS_ENUMS.VERSION_13, **kwargs):
@@ -71,21 +76,40 @@ class BaseObject(ABC):
         def to_internal_value(field, type):
             converters = dict(
                 STRTYPE=lambda x: x.text,
+                ESTYPE=lambda x: x.text,
                 IDTYPE=lambda x: x.text,
+                FLOATTYPE=lambda x: float(x.text),
                 BOOLTYPE=lambda x: bool(x.text),
-                # OBJTYPE=lambda x: x,
+                OBJTYPE=lambda x: import_object_cls(x.tag).from_lxml(x),
                 # LISTTYPE=lambda x: x,
+                # TODO: I need some idea to implement conversion from xml list
             )
             return converters[type](field) if type in converters else None
 
-        obj = cls()
+        obj_data = dict()
         for field in list(lxml_obj):
-            if field.tag in cls.fields:
-                setattr(obj, field.tag, to_internal_value(field, cls.fields[field.tag]['validator']['type']))
-            elif field.tag == 'ParentRef':
-                setattr(obj, 'Parent', cls.from_lxml(field))
+            field_name = field.tag
+            if field_name in cls.fields:
+                obj_data[field_name] = to_internal_value(field, cls.fields[field_name]['validator']['type'])
+            elif field_name == 'ParentRef':
+                obj_data['Parent'] = cls.from_lxml(field)
+            elif isinstance(field_name, str) and any(index == len(field_name)-3 for index in list(map(field_name.find, ['Ref', 'Ret']))):
+                field_name = field_name[:len(field_name)-3]
+                if field_name in cls.fields:
+                    field.tag = field_name
+                    obj_data[field_name] = to_internal_value(field, cls.fields[field_name]['validator']['type'])
 
-        return obj
+        return cls(**obj_data)
+
+    def __eq__(self, other):
+        for field_name, options in self.fields.items():
+            if not hasattr(self, field_name) and hasattr(other, field_name):
+                return False
+            if not hasattr(other, field_name) and hasattr(self, field_name):
+                return False
+            if getattr(self, field_name) != getattr(other, field_name):
+                return False
+        return True
 
     @staticmethod
     def get_service():

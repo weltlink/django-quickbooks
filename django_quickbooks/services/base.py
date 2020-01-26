@@ -31,6 +31,11 @@ class Service:
         xml += xml_setter(resource + QUICKBOOKS_ENUMS.OPP_VOID + 'Rq', object.as_xml(opp_type=QUICKBOOKS_ENUMS.OPP_VOID))
         return self._prepare_request(xml)
 
+    def _delete(self, resource, object):
+        xml = ''
+        xml += xml_setter(resource + QUICKBOOKS_ENUMS.OPP_DEL + 'Rq', object.as_xml(opp_type=QUICKBOOKS_ENUMS.OPP_DEL))
+        return self._prepare_request(xml)
+
     def _all(self, resource):
         xml = xml_setter('MaxReturned', 100)
         xml = xml_setter(resource + QUICKBOOKS_ENUMS.OPP_QR + 'Rq', xml, metaData='NoMetaData', iterator='Start')

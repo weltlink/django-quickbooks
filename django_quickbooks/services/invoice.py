@@ -20,7 +20,12 @@ class InvoiceService(Service):
 
     def void(self, object):
         return self._void(
-            QUICKBOOKS_ENUMS.RESOURCE_TXN, Txn(TxnID=object.TxnID, TxnVoidType=QUICKBOOKS_ENUMS.RESOURCE_INVOICE)
+            QUICKBOOKS_ENUMS.RESOURCE_TXN, Txn(TxnID=object.TxnID, TxnType=QUICKBOOKS_ENUMS.RESOURCE_INVOICE)
+        )
+
+    def delete(self, object):
+        return self._delete(
+            QUICKBOOKS_ENUMS.RESOURCE_TXN, Txn(TxnID=object.TxnID, TxnType=QUICKBOOKS_ENUMS.RESOURCE_INVOICE)
         )
 
     def find_by_id(self, id):

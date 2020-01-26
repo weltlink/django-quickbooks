@@ -39,12 +39,16 @@ def str_type_validator(value):
     return isinstance(value, str)
 
 
+def es_type_validator(value):
+    return isinstance(value, str) and value.isnumeric()
+
+
 def id_type_validator(value):
     return str_type_validator(value)
 
 
 def bool_type_validator(value):
-    return isinstance(value, int) and value in [1, 0, 'true', 'false']
+    return value in [1, 0, 'true', 'false', '1', '0']
 
 
 def min_length_validator(value, length):
@@ -61,6 +65,7 @@ def float_type_validator(value):
 
 class SchemeValidator:
     STRTYPE = 'STRTYPE'
+    ESTYPE = 'ESTYPE'
     IDTYPE = 'IDTYPE'
     BOOLTYPE = 'BOOLTYPE'
     OBJTYPE = 'OBJTYPE'
@@ -69,6 +74,7 @@ class SchemeValidator:
 
     type_validators = dict(
         STRTYPE=str_type_validator,
+        ESTYPE=es_type_validator,
         IDTYPE=id_type_validator,
         BOOLTYPE=bool_type_validator,
         OBJTYPE=obj_type_validator,
