@@ -7,19 +7,13 @@ from django_quickbooks.objects import BillAddress, ShipAddress
 
 def test_create_bill_address_with_validation_error():
     with pytest.raises(ValidationError):
-        BillAddress(Addr1=12312)
-
-    with pytest.raises(ValidationError):
-        BillAddress(City=1234)
-
-    with pytest.raises(ValidationError):
-        BillAddress(State=1234)
-
-    with pytest.raises(ValidationError):
-        BillAddress(PostalCode=1234)
-
-    with pytest.raises(ValidationError):
-        BillAddress(Country=1234)
+        BillAddress(
+            Addr1=12312,
+            City=1234,
+            State=1234,
+            PostalCode=1234,
+            Country=1234,
+        )
 
 
 def test_create_bill_address(sample_address_data):

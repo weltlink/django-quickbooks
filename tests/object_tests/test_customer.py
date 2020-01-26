@@ -7,43 +7,21 @@ from django_quickbooks.objects import Customer, BillAddress, ShipAddress
 
 def test_create_customer_validation_with_error():
     with pytest.raises(ValidationError):
-        Customer(ListID=12312)
-
-    with pytest.raises(ValidationError):
-        Customer(EditSequence='asdf')
-
-    with pytest.raises(ValidationError):
-        Customer(Name=1234)
-
-    with pytest.raises(ValidationError):
-        Customer(FullName=1234)
-
-    with pytest.raises(ValidationError):
-        Customer(IsActive='True')
-
-    with pytest.raises(ValidationError):
-        Customer(BillAddress='Somewhere near Amazon')
-
-    with pytest.raises(ValidationError):
-        Customer(CompanyName=1234)
-
-    with pytest.raises(ValidationError):
-        Customer(Phone=1234)
-
-    with pytest.raises(ValidationError):
-        Customer(AltPhone=1234)
-
-    with pytest.raises(ValidationError):
-        Customer(Fax=1234)
-
-    with pytest.raises(ValidationError):
-        Customer(Email=1234)
-
-    with pytest.raises(ValidationError):
-        Customer(Contact=1234)
-
-    with pytest.raises(ValidationError):
-        Customer(AltContact=1234)
+        Customer(
+            ListID=12312,
+            EditSequence='asdf',
+            Name=1234,
+            FullName=1234,
+            IsActive='True',
+            BillAddress='Somewhere near Amazon',
+            CompanyName=1234,
+            Phone=1234,
+            AltPhone=1234,
+            Fax=1234,
+            Email=1234,
+            Contact=1234,
+            AltContact=1234
+        )
 
 
 def test_create_customer(sample_customer_data, sample_address_data):
