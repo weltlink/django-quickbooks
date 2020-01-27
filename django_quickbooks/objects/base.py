@@ -7,6 +7,12 @@ from django_quickbooks.utils import xml_setter
 from django_quickbooks.validators import SchemeValidator, is_primitive, is_list
 
 
+def _default_value_setter(key, type):
+    if type == 'LISTTYPE':
+        return []
+    return None
+
+
 class BaseObject(ABC):
     fields = dict()
     validator = SchemeValidator()
@@ -25,7 +31,10 @@ class BaseObject(ABC):
 
         for field_name, options in self.fields.items():
             if not hasattr(self, field_name):
-                setattr(self, field_name, None)
+                setattr(self,
+                        field_name,
+                        _default_value_setter(field_name, self.fields[field_name]['validator']['type'])
+                        )
 
     def as_xml(self, class_name=None, indent=0, opp_type=QUICKBOOKS_ENUMS.OPP_ADD,
                version=QUICKBOOKS_ENUMS.VERSION_13, **kwargs):
@@ -33,6 +42,8 @@ class BaseObject(ABC):
         for field_key, options in self.fields.items():
             if hasattr(self, field_key):
                 obj = getattr(self, field_key)
+                if not obj:
+                    continue
                 if is_primitive(obj):
                     if self.fields[field_key]['validator']['type'] == self.validator.BOOLTYPE:
                         xml += xml_setter(field_key, str(obj).lower(), encode=True)
@@ -81,23 +92,32 @@ class BaseObject(ABC):
                 FLOATTYPE=lambda x: float(x.text),
                 BOOLTYPE=lambda x: bool(x.text),
                 OBJTYPE=lambda x: import_object_cls(x.tag).from_lxml(x),
-                # LISTTYPE=lambda x: x,
-                # TODO: I need some idea to implement conversion from xml list
             )
             return converters[type](field) if type in converters else None
 
         obj_data = dict()
         for field in list(lxml_obj):
             field_name = field.tag
+            value = None
             if field_name in cls.fields:
-                obj_data[field_name] = to_internal_value(field, cls.fields[field_name]['validator']['type'])
+                value = to_internal_value(field, cls.fields[field_name]['validator']['type'])
             elif field_name == 'ParentRef':
-                obj_data['Parent'] = cls.from_lxml(field)
-            elif isinstance(field_name, str) and any(index == len(field_name)-3 for index in list(map(field_name.find, ['Ref', 'Ret']))):
-                field_name = field_name[:len(field_name)-3]
+                field_name = 'Parent'
+                value = cls.from_lxml(field)
+            elif isinstance(field_name, str) and any(
+                    index == len(field_name) - 3 for index in list(map(field_name.find, ['Ref', 'Ret']))):
+                field_name = field_name[:len(field_name) - 3]
                 if field_name in cls.fields:
                     field.tag = field_name
-                    obj_data[field_name] = to_internal_value(field, cls.fields[field_name]['validator']['type'])
+                    value = to_internal_value(field, cls.fields[field_name]['validator']['type'])
+            if value:
+                if field_name in cls.fields and cls.fields[field_name].get('many', False):
+                    if field_name in obj_data:
+                        obj_data[field_name].append(value)
+                    else:
+                        obj_data[field_name] = [value]
+                else:
+                    obj_data[field_name] = value
 
         return cls(**obj_data)
 

@@ -40,7 +40,7 @@ class Invoice(BaseObject):
         IsPending=dict(validator=dict(type=SchemeValidator.BOOLTYPE)),
         DueDate=dict(validator=dict(type=SchemeValidator.STRTYPE)),
         Memo=dict(validator=dict(type=SchemeValidator.STRTYPE)),
-        InvoiceLine=dict(validator=dict(type=SchemeValidator.LISTTYPE)),
+        InvoiceLine=dict(many=True, validator=dict(type=SchemeValidator.OBJTYPE)),
     )
 
     @staticmethod

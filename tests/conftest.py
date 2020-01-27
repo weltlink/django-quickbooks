@@ -1,4 +1,5 @@
 import pytest
+from lxml import etree
 
 
 @pytest.fixture
@@ -216,3 +217,25 @@ def sample_invoice_data():
         DueDate='2018-03-24T00:31:04+05:00',
         Memo='a2e8929f-6f03-4bc2-ad27-ea6aa2cc11cd',
     )
+
+
+@pytest.fixture()
+def xml_compare_fn():
+    def remove_whitespaces(xml):
+        tree = etree.fromstring(xml)
+        root = tree.getroottree()
+
+        for elem in root.iter('*'):
+            if elem.text is not None:
+                elem.text = elem.text.strip()
+            if elem.tail is not None:
+                elem.tail = elem.tail.strip()
+        return root
+
+    def compare(xml1, xml2):
+        tree1 = remove_whitespaces(xml1)
+        tree2 = remove_whitespaces(xml2)
+
+        assert etree.tostring(tree1, encoding="utf-8", xml_declaration=True) == etree.tostring(tree2, encoding="utf-8", xml_declaration=True)
+
+    return compare

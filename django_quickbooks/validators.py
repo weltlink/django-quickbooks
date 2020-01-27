@@ -1,3 +1,5 @@
+from itertools import starmap
+
 from django_quickbooks import QUICKBOOKS_ENUMS
 from django_quickbooks.exceptions import ValidationOptionNotFound
 
@@ -5,10 +7,6 @@ from django_quickbooks.exceptions import ValidationOptionNotFound
 def obj_type_validator(value):
     from django_quickbooks.objects.base import BaseObject
     return isinstance(value, BaseObject)
-
-
-def list_type_validator(value):
-    return isinstance(value, list)
 
 
 def is_primitive(value):
@@ -69,7 +67,6 @@ class SchemeValidator:
     IDTYPE = 'IDTYPE'
     BOOLTYPE = 'BOOLTYPE'
     OBJTYPE = 'OBJTYPE'
-    LISTTYPE = 'LISTTYPE'
     FLOATTYPE = 'FLOATTYPE'
 
     type_validators = dict(
@@ -78,7 +75,6 @@ class SchemeValidator:
         IDTYPE=id_type_validator,
         BOOLTYPE=bool_type_validator,
         OBJTYPE=obj_type_validator,
-        LISTTYPE=list_type_validator,
         FLOATTYPE=float_type_validator,
     )
     option_validators = dict(
@@ -87,12 +83,23 @@ class SchemeValidator:
     )
 
     def validate(self, value, **options):
-        validator = options.pop('validator')
         required = options.pop('required', False)
-        typ = validator['type']
 
         if not value and not required:
+
             return True
+
+        many = options.pop('many', False)
+
+        if many and not isinstance(value, list):
+            # should be given list type but given something else
+            return False
+
+        if many:
+            return all([self.validate(single_value, **options) for single_value in value])
+
+        validator = options.pop('validator')
+        typ = validator['type']
 
         if not self.type_validators[typ](value):
             return False

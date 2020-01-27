@@ -29,7 +29,4 @@ class InvoiceService(Service):
         )
 
     def find_by_id(self, id):
-        return self._find_by_id(QUICKBOOKS_ENUMS.RESOURCE_INVOICE, id)
-
-    def find_by_full_name(self, full_name):
-        return self._find_by_full_name(QUICKBOOKS_ENUMS.RESOURCE_INVOICE, full_name)
+        return self._find_by_id(QUICKBOOKS_ENUMS.RESOURCE_INVOICE, id, field_name='TxnID')

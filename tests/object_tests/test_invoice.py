@@ -88,5 +88,12 @@ def test_create_invoice_from_xml(
     assert invoice.ShipAddress == ShipAddress(**sample_address_data)
     assert invoice.Customer == Customer(**sample_invoice_customer_data)
 
-    assert invoice.InvoiceLine is None
-    # FIXME: implement xml list to python list conversion: to_internal_value()
+    assert isinstance(invoice.InvoiceLine, list)
+    assert invoice.InvoiceLine[0] == InvoiceLine(
+        **sample_invoice_line1_data,
+        Item=ItemService(**sample_invoice_item_service1_data)
+    )
+    assert invoice.InvoiceLine[1] == InvoiceLine(
+        **sample_invoice_line2_data,
+        Item=ItemService(**sample_invoice_item_service2_data)
+    )
