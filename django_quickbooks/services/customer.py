@@ -3,7 +3,7 @@ from django_quickbooks.services.base import Service
 
 
 class CustomerService(Service):
-    complex_fields = ['BillAddress']
+    complex_fields = ['BillAddress', 'ShipAddress']
 
     def add(self, object):
         return self._add(QUICKBOOKS_ENUMS.RESOURCE_CUSTOMER, object)

@@ -41,7 +41,7 @@ def sample_customer_xml():
         <Phone>998909090909</Phone> <!-- optional -->
         <AltPhone>998909090910</AltPhone> <!-- optional -->
         <Fax>998909090911</Fax> <!-- optional -->
-        <Email>998909090911</Email> <!-- optional -->
+        <Email>info@amazon.com</Email> <!-- optional -->
         <Contact>Someone from Amazon</Contact> <!-- optional -->
         <AltContact>Some other one from Amazon</AltContact> <!-- optional -->
     </CustomerRet>
@@ -62,7 +62,7 @@ def sample_customer_data():
         Phone='998909090909',
         AltPhone='998909090910',
         Fax='998909090911',
-        Email='998909090911',
+        Email='info@amazon.com',
         Contact='Someone from Amazon',
         AltContact='Some other one from Amazon',
     )

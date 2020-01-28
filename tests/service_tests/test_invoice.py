@@ -216,3 +216,41 @@ def sample_invoice_query_id_xml():
 def test_invoice_service_query_id(invoice_service, sample_invoice_query_id_xml, xml_compare_fn):
     checking_xml = invoice_service.find_by_id('800004ED-1525972764')
     xml_compare_fn(checking_xml, sample_invoice_query_id_xml)
+
+
+@pytest.fixture
+def sample_invoice_void_xml():
+    return """<?xml version="1.0"?><?qbxml version="13.0"?>
+<QBXML>
+    <QBXMLMsgsRq onError="stopOnError">
+        <TxnVoidRq>
+            <TxnID>800004ED-1525972764</TxnID>
+            <TxnVoidType>Invoice</TxnVoidType>
+        </TxnVoidRq>
+    </QBXMLMsgsRq>
+</QBXML>
+    """
+
+
+def test_invoice_service_void(invoice_service, sample_invoice_mod, sample_invoice_void_xml, xml_compare_fn):
+    checking_xml = invoice_service.void(sample_invoice_mod)
+    xml_compare_fn(checking_xml, sample_invoice_void_xml)
+
+
+@pytest.fixture
+def sample_invoice_delete_xml():
+    return """<?xml version="1.0"?><?qbxml version="13.0"?>
+<QBXML>
+    <QBXMLMsgsRq onError="stopOnError">
+        <TxnDelRq>
+            <TxnID>800004ED-1525972764</TxnID>
+            <TxnDelType>Invoice</TxnDelType>
+        </TxnDelRq>
+    </QBXMLMsgsRq>
+</QBXML>
+    """
+
+
+def test_invoice_service_delete(invoice_service, sample_invoice_mod, sample_invoice_delete_xml, xml_compare_fn):
+    checking_xml = invoice_service.delete(sample_invoice_mod)
+    xml_compare_fn(checking_xml, sample_invoice_delete_xml)
