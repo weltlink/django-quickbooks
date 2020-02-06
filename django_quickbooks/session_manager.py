@@ -1,3 +1,4 @@
+from django.db import connection
 from lxml import etree
 
 from django_quickbooks import get_realm_session_model, get_realm_model, get_qbd_task_model
@@ -27,6 +28,9 @@ class SessionManager(BaseSessionManager, RabbitMQManager):
 
     def add_new_jobs(self, realm):
         queryset = QBDTask.objects.filter(realm=realm).order_by('created_at')
+        # FIXME: connection should not be initiated for changing schemas (django-tenant-schemas should be exctracted
+        #  from the project
+        connection.set_schema(realm.schema_name)
         for qb_task in queryset:
             self.publish_message(qb_task.get_request(), str(realm.id))
         queryset.delete()

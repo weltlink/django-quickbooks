@@ -10,7 +10,7 @@ LocalInvoice = qbwc_settings.LOCAL_MODEL_CLASSES['Invoice']
 
 
 class InvoiceAddResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
-    local_obj_class = LocalInvoice
+    local_model_class = LocalInvoice
     obj_class = Invoice
 
     resource = QUICKBOOKS_ENUMS.RESOURCE_INVOICE
@@ -33,9 +33,11 @@ class InvoiceAddResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
         return True
 
     def find_by_id(self, id):
+        # FIXME: connection should not be initiated for changing schemas (django-tenant-schemas should be exctracted
+        #  from the project
         connection.set_schema(self.realm.schema_name)
         try:
-            return self.local_obj_class.objects.get(id=id)
+            return self.local_model_class.objects.get(id=id)
         except ObjectDoesNotExist:
             return None
 
@@ -47,7 +49,7 @@ class InvoiceAddResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
 
 
 class InvoiceModResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
-    local_obj_class = LocalInvoice
+    local_model_class = LocalInvoice
     obj_class = Invoice
 
     resource = QUICKBOOKS_ENUMS.RESOURCE_INVOICE
@@ -55,7 +57,7 @@ class InvoiceModResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
 
 
 class InvoiceQueryResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
-    local_obj_class = LocalInvoice
+    local_model_class = LocalInvoice
     obj_class = Invoice
 
     resource = QUICKBOOKS_ENUMS.RESOURCE_INVOICE

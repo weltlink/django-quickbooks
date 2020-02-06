@@ -113,7 +113,7 @@ class QBWCSettings(object):
         if attr in self.import_strings:
             val = perform_import(val, attr)
 
-        if attr == 'LOCAL_MODELS':
+        if attr == 'LOCAL_MODEL_CLASSES':
             for key, value in val.items():
                 val[key] = import_from_string(value, value)
 

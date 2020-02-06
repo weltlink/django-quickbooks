@@ -8,7 +8,7 @@ LocalCustomer = qbwc_settings.LOCAL_MODEL_CLASSES['Customer']
 class CustomerQueryResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
     resource = QUICKBOOKS_ENUMS.RESOURCE_CUSTOMER
     op_type = QUICKBOOKS_ENUMS.OPP_QR
-    local_obj_class = LocalCustomer
+    local_model_class = LocalCustomer
     obj_class = Customer
 
     def process(self):
@@ -33,7 +33,7 @@ class CustomerQueryResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
 class CustomerAddResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
     resource = QUICKBOOKS_ENUMS.RESOURCE_CUSTOMER
     op_type = QUICKBOOKS_ENUMS.OPP_ADD
-    local_obj_class = LocalCustomer
+    local_model_class = LocalCustomer
     obj_class = Customer
 
     def process(self):
@@ -54,7 +54,7 @@ class CustomerAddResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
 class CustomerModResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
     resource = QUICKBOOKS_ENUMS.RESOURCE_CUSTOMER
     op_type = QUICKBOOKS_ENUMS.OPP_MOD
-    local_obj_class = LocalCustomer
+    local_model_class = LocalCustomer
     obj_class = Customer
 
     def process(self):

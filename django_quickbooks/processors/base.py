@@ -60,7 +60,7 @@ class ResponseProcessor:
 
 
 class ResponseProcessorMixin:
-    local_obj_class = None
+    local_model_class = None
 
     def update(self, local_obj, obj):
         if local_obj.qbd_object_version != obj.EditSequence:
@@ -71,20 +71,24 @@ class ResponseProcessorMixin:
             local_obj.save()
 
     def find_by_list_id(self, list_id):
+        # FIXME: connection should not be initiated for changing schemas (django-tenant-schemas should be exctracted
+        #  from the project
         connection.set_schema(self.realm.schema_name)
         try:
-            return self.local_obj_class.objects.get(qbd_object_id=list_id)
+            return self.local_model_class.objects.get(qbd_object_id=list_id)
         except ObjectDoesNotExist:
             return None
 
     def find_by_name(self, name, field_name='name'):
+        # FIXME: connection should not be initiated for changing schemas (django-tenant-schemas should be exctracted
+        #  from the project
         connection.set_schema(self.realm.schema_name)
         try:
-            return self.local_obj_class.objects.get(**{field_name: name})
+            return self.local_model_class.objects.get(**{field_name: name})
         except ObjectDoesNotExist:
             return None
 
     def create(self, obj):
         connection.set_schema(self.realm.schema_name)
-        customer = self.local_obj_class.from_qbd_obj(obj)
+        customer = self.local_model_class.from_qbd_obj(obj)
         customer.save()
