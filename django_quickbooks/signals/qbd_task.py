@@ -9,9 +9,9 @@ RealmModel = get_realm_model()
 
 
 @receiver(qbd_task_create)
-def create_qbd_task(sender, qb_operation, qb_resource, object_id, content_type, schema_name, instance=None, *args, **kwargs):
+def create_qbd_task(sender, qb_operation, qb_resource, object_id, content_type, realm_id, instance=None, *args, **kwargs):
     try:
-        realm = RealmModel.objects.get(schema_name=schema_name)
+        realm = RealmModel.objects.get(id=realm_id)
         data = dict(
             qb_resource=qb_resource,
             object_id=object_id,

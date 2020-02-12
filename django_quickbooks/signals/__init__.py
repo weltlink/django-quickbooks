@@ -5,15 +5,15 @@ qbd_task_create = Signal(providing_args=[
     "qb_resource",
     "object_id",
     "content_type",
-    "schema_name",
+    "realm_id",
     "instance",
 ])
 
-customer_created = Signal(providing_args=["qbd_model_mixin_obj", "schema_name"])
-customer_updated = Signal(providing_args=["qbd_model_mixin_obj", "schema_name"])
-invoice_created = Signal(providing_args=["qbd_model_mixin_obj", "schema_name"])
-invoice_updated = Signal(providing_args=["qbd_model_mixin_obj", "schema_name"])
-qbd_first_time_connected = Signal(providing_args=["schema_name"])
+customer_created = Signal(providing_args=["qbd_model_mixin_obj", "realm_id"])
+customer_updated = Signal(providing_args=["qbd_model_mixin_obj", "realm_id"])
+invoice_created = Signal(providing_args=["qbd_model_mixin_obj", "realm_id"])
+invoice_updated = Signal(providing_args=["qbd_model_mixin_obj", "realm_id"])
+qbd_first_time_connected = Signal(providing_args=["realm_id"])
 
 from django_quickbooks.signals.customer import *
 from django_quickbooks.signals.invoice import *

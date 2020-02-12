@@ -1,5 +1,4 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import connection
 from django.utils import timezone
 
 from django_quickbooks import QUICKBOOKS_ENUMS, qbwc_settings
@@ -16,8 +15,8 @@ class InvoiceAddResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
     resource = QUICKBOOKS_ENUMS.RESOURCE_INVOICE
     op_type = QUICKBOOKS_ENUMS.OPP_ADD
 
-    def process(self):
-        cont = super().process()
+    def process(self, realm):
+        cont = super().process(realm)
         if not cont:
             return False
         for invoice_ret in list(self._response_body):
@@ -33,9 +32,6 @@ class InvoiceAddResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
         return True
 
     def find_by_id(self, id):
-        # FIXME: connection should not be initiated for changing schemas (django-tenant-schemas should be exctracted
-        #  from the project
-        connection.set_schema(self.realm.schema_name)
         try:
             return self.local_model_class.objects.get(id=id)
         except ObjectDoesNotExist:

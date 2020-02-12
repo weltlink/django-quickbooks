@@ -1,8 +1,11 @@
-from django.db import connection
+import logging
+
+from django.utils.decorators import method_decorator
 from lxml import etree
 
 from django_quickbooks import get_realm_session_model, get_realm_model, get_qbd_task_model
 from django_quickbooks.core.session_manager import BaseSessionManager
+from django_quickbooks.decorators import realm_connection
 from django_quickbooks.exceptions import QBXMLParseError, QBXMLStatusError
 from django_quickbooks.queue_manager import RabbitMQManager
 
@@ -26,11 +29,9 @@ class SessionManager(BaseSessionManager, RabbitMQManager):
     def in_session(self, realm):
         return RealmSession.objects.is_active(realm)
 
-    def add_new_jobs(self, realm):
+    @method_decorator(realm_connection())
+    def add_new_jobs(self, realm=None):
         queryset = QBDTask.objects.filter(realm=realm).order_by('created_at')
-        # FIXME: connection should not be initiated for changing schemas (django-tenant-schemas should be exctracted
-        #  from the project
-        connection.set_schema(realm.schema_name)
         for qb_task in queryset:
             self.publish_message(qb_task.get_request(), str(realm.id))
         queryset.delete()
@@ -44,13 +45,17 @@ class SessionManager(BaseSessionManager, RabbitMQManager):
         processors = get_processors()
         for processor in processors:
             try:
-                processed = processor(realm, response, hresult, message).process()
+                processed = processor(response, hresult, message).process(realm)
                 if processed:
                     break
 
-            except QBXMLParseError:
+            except QBXMLParseError as exc:
+                logger = logging.getLogger('django.request')
+                logger.error(exc.error)
                 return -1
-            except QBXMLStatusError:
+            except QBXMLStatusError as exc:
+                logger = logging.getLogger('django.request')
+                logger.error(exc.error)
                 return -1
 
         self._continue_iterative_response(ticket, response)

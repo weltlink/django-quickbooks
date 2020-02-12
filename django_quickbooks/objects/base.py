@@ -1,3 +1,4 @@
+import logging
 from abc import ABC
 
 from django_quickbooks import QUICKBOOKS_ENUMS
@@ -19,15 +20,22 @@ class BaseObject(ABC):
 
     def __setattr__(self, key, value):
         if key in self.fields:
-            if self.validator.validate(value, **self.fields[key]):
-                pass
-            else:
-                raise ValidationError
-        super().__setattr__(key, value)
+            super().__setattr__(key, value)
 
     def __init__(self, **kwargs):
-        for key, value in kwargs.items():
-            setattr(self, key, value)
+        errors = []
+        # FIXME: ValidationError handling still seems clumsy, need to reviewed
+        for field_name, value in kwargs.items():
+            try:
+                self.validator.validate(field_name, value, **self.fields[field_name])
+                setattr(self, field_name, value)
+            except ValidationError as exc:
+                errors.append(exc.detail)
+
+        if errors:
+            logger = logging.getLogger('django.request')
+            logging.error(errors)
+            raise ValidationError(errors)
 
         for field_name, options in self.fields.items():
             if not hasattr(self, field_name):

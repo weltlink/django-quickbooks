@@ -4,7 +4,7 @@ This is an ongoing project to integrate any Django project with Quickbooks Deskt
 integration support for <b>Python 3.6+</b> and <b>Django 2.0+</b>
 
 
-| Version:  | 0.5.1                                                                                                                |
+| Version:  | 0.6.0                                                                                                                |
 |-----------|--------------------------------------------------------------------------------------------------------------------|
 | Download: | https://pypi.org/project/django-quickbooks/                                                                        |
 | Source:   | https://github.com/weltlink/django-quickbooks/                                                                     |
@@ -54,6 +54,10 @@ integration support for <b>Python 3.6+</b> and <b>Django 2.0+</b>
 
 ## Notice
 Soap server for Quickbooks Web Connector is built on top of Spyne and Lxml.
+
+
+## Setup & Documentation
+ **This is just a short guide for quickstart**, however  
 
 
 ## Links

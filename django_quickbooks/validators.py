@@ -1,7 +1,6 @@
-from itertools import starmap
-
 from django_quickbooks import QUICKBOOKS_ENUMS
-from django_quickbooks.exceptions import ValidationOptionNotFound
+from django_quickbooks.exceptions import VALIDATION_MESSAGES, ValidationCode
+from django_quickbooks.exceptions import ValidationOptionNotFound, ValidationError
 
 
 def obj_type_validator(value):
@@ -30,35 +29,60 @@ def operation_type(value):
 
 
 def is_list(value):
-    return isinstance(value, list)
+    if not isinstance(value, list):
+        raise ValidationError(VALIDATION_MESSAGES[ValidationCode.INVALID_TYPE] % (type(value), str),
+                              ValidationCode.INVALID_TYPE)
 
 
 def str_type_validator(value):
-    return isinstance(value, str)
+    if not isinstance(value, str):
+        raise ValidationError(VALIDATION_MESSAGES[ValidationCode.INVALID_TYPE] % (type(value), str),
+                              ValidationCode.INVALID_TYPE)
 
 
 def es_type_validator(value):
-    return isinstance(value, str) and value.isnumeric()
+    if not isinstance(value, str) or not value.isnumeric():
+        raise ValidationError(VALIDATION_MESSAGES[ValidationCode.INVALID_TYPE] % (type(value), str),
+                              ValidationCode.INVALID_TYPE)
 
 
 def id_type_validator(value):
-    return str_type_validator(value)
+    if not isinstance(value, str):
+        raise ValidationError(VALIDATION_MESSAGES[ValidationCode.INVALID_TYPE] % (type(value), str),
+                              ValidationCode.INVALID_TYPE)
 
 
 def bool_type_validator(value):
-    return value in [1, 0, 'true', 'false', '1', '0']
+    if value not in [1, 0, 'true', 'false', '1', '0']:
+        raise ValidationError(VALIDATION_MESSAGES[ValidationCode.INVALID_TYPE] % (type(value), bool),
+                              ValidationCode.INVALID_TYPE)
 
 
 def min_length_validator(value, length):
-    return len(value) >= length
+    if len(value) < length:
+        raise ValidationError(VALIDATION_MESSAGES[ValidationCode.MIN_LENGTH] % length, ValidationCode.MIN_LENGTH)
 
 
 def max_length_validator(value, length):
-    return len(value) <= length
+    if len(value) > length:
+        raise ValidationError(VALIDATION_MESSAGES[ValidationCode.MAX_LENGTH] % length, ValidationCode.MAX_LENGTH)
 
 
 def float_type_validator(value):
-    return isinstance(value, float)
+    if not isinstance(value, float):
+        raise ValidationError(VALIDATION_MESSAGES[ValidationCode.INVALID_TYPE] % (type(value), float),
+                              ValidationCode.INVALID_TYPE)
+
+
+def required_validator(value, required=False):
+    if not value and required:
+        raise ValidationError(VALIDATION_MESSAGES[ValidationCode.REQUIRED], ValidationCode.REQUIRED)
+
+
+def many_validator(value, many=False):
+    if not isinstance(value, list) and many:
+        raise ValidationError(VALIDATION_MESSAGES[ValidationCode.INVALID_TYPE] % (type(value), list),
+                              ValidationCode.INVALID_TYPE)
 
 
 class SchemeValidator:
@@ -82,32 +106,49 @@ class SchemeValidator:
         max_length=max_length_validator,
     )
 
-    def validate(self, value, **options):
+    def validate(self, field_name, value, **options):
+        errors = []
+
         required = options.pop('required', False)
 
-        if not value and not required:
-
-            return True
+        try:
+            required_validator(value, required)
+        except ValidationError as exc:
+            errors.append(exc.detail)
 
         many = options.pop('many', False)
 
-        if many and not isinstance(value, list):
+        try:
             # should be given list type but given something else
-            return False
+            many_validator(value, many)
+        except ValidationError as exc:
+            errors.append(exc.detail)
 
         if many:
-            return all([self.validate(single_value, **options) for single_value in value])
+            for single_value in value:
+                try:
+                    self.validate(single_value, **options)
+                except ValidationError as exc:
+                    errors.append(exc.detail)
+
+            if errors:
+                raise ValidationError(errors, field_name)
 
         validator = options.pop('validator')
         typ = validator['type']
 
-        if not self.type_validators[typ](value):
-            return False
+        try:
+            self.type_validators[typ](value)
+        except ValidationError as exc:
+            errors.append(exc.detail)
 
         for value, key in options.items():
             if value not in self.option_validators:
                 raise ValidationOptionNotFound
-            if not self.option_validators[value](key):
-                return False
+            try:
+                self.option_validators[value](key)
+            except ValidationError as exc:
+                errors.append(exc.detail)
 
-        return True
+        if errors:
+            raise ValidationError(errors, field_name)

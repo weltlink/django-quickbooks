@@ -8,8 +8,8 @@ class ItemServiceQueryResponseProcessor(ResponseProcessor):
     op_type = QUICKBOOKS_ENUMS.OPP_QR
     obj_class = ItemService
 
-    def process(self):
-        cont = super().process()
+    def process(self, realm):
+        cont = super().process(realm)
         if not cont:
             return False
 

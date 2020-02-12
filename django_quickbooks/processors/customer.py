@@ -11,8 +11,8 @@ class CustomerQueryResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
     local_model_class = LocalCustomer
     obj_class = Customer
 
-    def process(self):
-        cont = super().process()
+    def process(self, realm):
+        cont = super().process(realm)
         if not cont:
             return False
         for customer_ret in list(self._response_body):
@@ -36,8 +36,8 @@ class CustomerAddResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
     local_model_class = LocalCustomer
     obj_class = Customer
 
-    def process(self):
-        cont = super().process()
+    def process(self, relam):
+        cont = super().process(realm)
         if not cont:
             return False
         for customer_ret in list(self._response_body):
@@ -57,8 +57,8 @@ class CustomerModResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
     local_model_class = LocalCustomer
     obj_class = Customer
 
-    def process(self):
-        cont = super().process()
+    def process(self, realm):
+        cont = super().process(realm)
         if not cont:
             return False
         for customer_ret in list(self._response_body):

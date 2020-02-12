@@ -52,21 +52,6 @@ class RealmSessionMixin(models.Model):
         abstract = True
 
 
-class Realm(RealmMixin):
-    schema_name = models.CharField(max_length=100, unique=True)
-    is_active = models.BooleanField(default=True)
-
-    class Meta:
-        abstract = False
-
-
-class RealmSession(RealmSessionMixin):
-    realm = models.ForeignKey(Realm, on_delete=models.CASCADE, related_name='sessions')
-
-    class Meta:
-        abstract = False
-
-
 class QBDTaskMixin(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     qb_operation = models.CharField(max_length=25)
@@ -100,6 +85,29 @@ class QBDTaskMixin(models.Model):
             return service.void(obj.to_qbd_obj())
         else:
             return None
+
+
+# Below models are concrete implementations of above classes
+# As initially I was working with django-tenant-schemas package I had to convert to that architecture
+# Thus, below models are extended with schema_name concept that is the core of the django-tenant-schemas package:
+# For more information: https://github.com/bernardopires/django-tenant-schemas
+
+# NOTICE: you also find decorators in the package that only work with django-tenant-schemas
+
+
+class Realm(RealmMixin):
+    schema_name = models.CharField(max_length=100, unique=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        abstract = False
+
+
+class RealmSession(RealmSessionMixin):
+    realm = models.ForeignKey(Realm, on_delete=models.CASCADE, related_name='sessions')
+
+    class Meta:
+        abstract = False
 
 
 class QBDTask(QBDTaskMixin):

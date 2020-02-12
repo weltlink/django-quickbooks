@@ -13,6 +13,8 @@ DEFAULTS = {
     'REALM_MODEL_CLASS': 'django_quickbooks.models.Realm',
     'REALM_SESSION_MODEL_CLASS': 'django_quickbooks.models.RealmSession',
     'QBD_TASK_MODEL_CLASS': 'django_quickbooks.models.QBDTask',
+    
+    'REALM_CONNECTION_DECORATOR': 'django_quickbooks.decorators.base_realm_tenant_connection',
 
     'RESPONSE_PROCESSORS': (
         'django_quickbooks.processors.CustomerQueryResponseProcessor',
@@ -49,6 +51,7 @@ IMPORT_STRINGS = (
     'REALM_MODEL_CLASS',
     'REALM_SESSION_MODEL_CLASS',
     'QBD_TASK_MODEL_CLASS',
+    'REALM_CONNECTION_DECORATOR',
 )
 
 
