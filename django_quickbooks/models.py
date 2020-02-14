@@ -4,10 +4,12 @@ from uuid import uuid4, uuid1
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from lxml import etree
 
 from django_quickbooks import qbwc_settings, QUICKBOOKS_ENUMS
+from django_quickbooks.exceptions import QBOperationNotFound
 from django_quickbooks.managers import RealmQuerySet, RealmSessionQuerySet, QBDTaskQuerySet
 from django_quickbooks.objects import import_object_cls
 
@@ -74,7 +76,7 @@ class QBDTaskMixin(models.Model):
         if self.qb_operation == QUICKBOOKS_ENUMS.OPP_QR:
             return service.all()
         elif not obj:
-            return None
+            raise ObjectDoesNotExist
         elif self.qb_operation == QUICKBOOKS_ENUMS.OPP_MOD:
             return service.update(obj.to_qbd_obj())
         elif self.qb_operation == QUICKBOOKS_ENUMS.OPP_ADD:
@@ -84,7 +86,7 @@ class QBDTaskMixin(models.Model):
         elif self.qb_operation == QUICKBOOKS_ENUMS.OPP_VOID:
             return service.void(obj.to_qbd_obj())
         else:
-            return None
+            raise QBOperationNotFound
 
 
 # Below models are concrete implementations of above classes

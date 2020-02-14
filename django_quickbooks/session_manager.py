@@ -1,12 +1,13 @@
 import logging
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from lxml import etree
 
 from django_quickbooks import get_realm_session_model, get_realm_model, get_qbd_task_model
 from django_quickbooks.core.session_manager import BaseSessionManager
 from django_quickbooks.decorators import realm_connection
-from django_quickbooks.exceptions import QBXMLParseError, QBXMLStatusError
+from django_quickbooks.exceptions import QBXMLParseError, QBXMLStatusError, QbException
 from django_quickbooks.queue_manager import RabbitMQManager
 
 Realm = get_realm_model()
@@ -33,7 +34,14 @@ class SessionManager(BaseSessionManager, RabbitMQManager):
     def add_new_jobs(self, realm=None):
         queryset = QBDTask.objects.filter(realm=realm).order_by('created_at')
         for qb_task in queryset:
-            self.publish_message(qb_task.get_request(), str(realm.id))
+            try:
+                self.publish_message(qb_task.get_request(), str(realm.id))
+            except QbException as exc:
+                logger = logging.getLogger('django.request')
+                logger.error(exc.detail)
+            except ObjectDoesNotExist:
+                pass
+
         queryset.delete()
 
     def new_jobs(self, realm):
@@ -51,11 +59,11 @@ class SessionManager(BaseSessionManager, RabbitMQManager):
 
             except QBXMLParseError as exc:
                 logger = logging.getLogger('django.request')
-                logger.error(exc.error)
+                logger.error(exc.detail)
                 return -1
             except QBXMLStatusError as exc:
                 logger = logging.getLogger('django.request')
-                logger.error(exc.error)
+                logger.error(exc.detail)
                 return -1
 
         self._continue_iterative_response(ticket, response)

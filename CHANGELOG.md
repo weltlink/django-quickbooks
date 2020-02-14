@@ -2,9 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.1] - 2020-02-14
+
+### ADDED
+
+- Add Exception coverage for QBTask request conversion
+- Add several exceptions
+
+## FIXED
+
+- Fix argument parameter of method CustomerAddResponseProcessor.process()  
+
 ## [0.6.0] - 2020-02-12
 
-### Added
+### ADDED
 
 - Add ValidationError handling
 - Add basic decorators for realm connection
@@ -15,9 +26,10 @@ All notable changes to this project will be documented in this file.
 
 - All Signal `schema_name` arguments were changed to `realm_id` (after removing *django-tenant-schemas*)
 
-### Removed
+### REMOVED
 
 - Remove *django-tenant-schemas* dependency from project (make it as optional)
 
 
 [0.6.0]: https://github.com/weltlink/django-quickbooks/compare/0.5...0.6
+[0.6.1]: https://github.com/weltlink/django-quickbooks/compare/0.6...0.6.1

@@ -2,6 +2,7 @@ import logging
 from abc import ABC
 
 from django_quickbooks import QUICKBOOKS_ENUMS
+from django_quickbooks.exceptions import QBObjectServiceNotImplemented
 from django_quickbooks.exceptions import ValidationError
 from django_quickbooks.objects import import_object_cls
 from django_quickbooks.utils import xml_setter
@@ -141,4 +142,4 @@ class BaseObject(ABC):
 
     @staticmethod
     def get_service():
-        raise NotImplemented
+        raise QBObjectServiceNotImplemented

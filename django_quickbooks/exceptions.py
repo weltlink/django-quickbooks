@@ -21,8 +21,11 @@ def _get_error_details(detail, code):
 
 
 class QbException(Exception):
+    detail = 'Quickbooks exception error'
+
     def __init__(self, error):
-        self.error = error
+        if error:
+            self.detail = error
 
 
 class ValidationError(Exception):
@@ -51,4 +54,16 @@ class QBXMLParseError(QbException):
 
 
 class QBXMLStatusError(QbException):
+    pass
+
+
+class QBOperationNotFound(QbException):
+    pass
+
+
+class QBObjectNotImplemented(QbException):
+    pass
+
+
+class QBObjectServiceNotImplemented(QbException):
     pass

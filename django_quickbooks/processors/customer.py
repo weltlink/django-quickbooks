@@ -36,7 +36,7 @@ class CustomerAddResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
     local_model_class = LocalCustomer
     obj_class = Customer
 
-    def process(self, relam):
+    def process(self, realm):
         cont = super().process(realm)
         if not cont:
             return False
