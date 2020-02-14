@@ -23,7 +23,7 @@ def _get_error_details(detail, code):
 class QbException(Exception):
     detail = 'Quickbooks exception error'
 
-    def __init__(self, error):
+    def __init__(self, error=None):
         if error:
             self.detail = error
 
