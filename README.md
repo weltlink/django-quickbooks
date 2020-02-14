@@ -4,7 +4,7 @@ This is an ongoing project to integrate any Django project with Quickbooks Deskt
 integration support for <b>Python 3.6+</b> and <b>Django 2.0+</b>
 
 
-| Version:  | 0.6.1                                                                                                                |
+| Version:  | 0.6.2                                                                                                                |
 |-----------|--------------------------------------------------------------------------------------------------------------------|
 | Download: | https://pypi.org/project/django-quickbooks/                                                                        |
 | Source:   | https://github.com/weltlink/django-quickbooks/                                                                     |
