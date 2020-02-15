@@ -3,6 +3,13 @@
 This is an ongoing project to integrate any Django project with Quickbooks Desktop and Quickbooks Online. Quickbooks 
 integration support for <b>Python 3.6+</b> and <b>Django 2.0+</b>
 
+<div align="center">
+  Join our active, engaged community: <br>
+  <span> | </span>
+  <a href="https://spectrum.chat/django-quickbooks">Spectrum</a>
+  <span> | </span>
+</div>
+
 
 | Version:  | 0.6.3                                                                                                                |
 |-----------|--------------------------------------------------------------------------------------------------------------------|
@@ -57,8 +64,13 @@ Soap server for Quickbooks Web Connector is built on top of Spyne and Lxml.
 
 
 ## Setup & Documentation
- **This is just a short guide for quickstart**, however  
 
+
+## Contributing
+
+Check out our [smaller-roadmap](/README.md#Roadmap) or [larger-roadmap](https://github.com/weltlink/django-quickbooks/projects/1) 
+to see on what you can help us to improve. Or if you have any problem just drop us a line 
+or open an [issue](https://github.com/weltlink/django-quickbooks/issues/new) and we’ll work out how to handle it.
 
 ## Links
 * [Django Web Framework](https://www.djangoproject.com/)
