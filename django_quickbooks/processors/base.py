@@ -6,6 +6,7 @@ from lxml import etree
 from django_quickbooks import QBXML_RESPONSE_STATUS_CODES
 from django_quickbooks.decorators import realm_connection
 from django_quickbooks.exceptions import QBXMLParseError, QBXMLStatusError
+from django_quickbooks import utils
 
 
 class ResponseProcessor:
@@ -22,18 +23,19 @@ class ResponseProcessor:
         self._process()
 
     def _process(self):
+        xml_type = utils.get_xml_type()
         if self.hresult:
             raise QBXMLStatusError(self.message)
         qbxml_root = etree.fromstring(self._response)
-        if qbxml_root.tag != 'QBXML':
-            raise QBXMLParseError('QBXML tag not found')
+        if qbxml_root.tag != xml_type:
+            raise QBXMLParseError(f'{xml_type} tag not found')
         if len(qbxml_root) != 1:
-            raise QBXMLParseError('QBXML has more or less than 1 child')
+            raise QBXMLParseError(f'{xml_type} has more or less than 1 child')
         qbxml_msg_rs = qbxml_root[0]
-        if qbxml_msg_rs.tag != 'QBXMLMsgsRs':
-            raise QBXMLParseError('QBXMLMsgsRs tag not found')
+        if qbxml_msg_rs.tag != f'{xml_type}MsgsRs':
+            raise QBXMLParseError(f'{xml_type}MsgsRs tag not found')
         if len(qbxml_msg_rs) != 1:
-            raise QBXMLParseError('QBXMLMsgsRs has more or less than 1 child')
+            raise QBXMLParseError(f'{xml_type}MsgsRs has more or less than 1 child')
         response_body_root = qbxml_msg_rs[0]
         if 'statusCode' not in response_body_root.attrib:
             raise QBXMLParseError('statusCode is not found in %s' % response_body_root.tag)
