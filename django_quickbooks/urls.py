@@ -11,6 +11,7 @@ urlpatterns = [
         services=[QuickBooksService],
         tns='http://developer.intuit.com/',
         in_protocol=Soap11(validator='lxml'),
-        out_protocol=Soap11())
+        out_protocol=Soap11()),
+         name="quickbooks-desktop"
          ),
 ]
