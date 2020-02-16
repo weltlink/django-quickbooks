@@ -75,9 +75,10 @@ def import_from_string(val, setting_name):
     """
     try:
         # Nod to tastypie's use of importlib.
-        module_path, class_name = val.rsplit('.', 1)
-        module = import_module(module_path)
-        return getattr(module, class_name)
+        if val:
+            module_path, class_name = val.rsplit('.', 1)
+            module = import_module(module_path)
+            return getattr(module, class_name)
     except (ImportError, AttributeError) as e:
         msg = "Could not import '%s' for Quickbooks Web Connector setting '%s'. %s: %s." \
               % (val, setting_name, e.__class__.__name__, e)
