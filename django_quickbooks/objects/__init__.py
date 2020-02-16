@@ -29,3 +29,6 @@ from django_quickbooks.objects.invoice import \
     ItemService, \
     InvoiceLine, \
     Invoice
+
+from django_quickbooks.objects.customer_pos import \
+    Customer as CustomerPOS
