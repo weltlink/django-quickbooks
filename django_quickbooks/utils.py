@@ -40,11 +40,25 @@ def xml_setter(name, value, encode=False, **options):
 
 
 def get_xml_meta_info():
+    xml_type = get_xml_type()
+    if xml_type == 'QBXML':
+        xml_version = 'qbxml version="13.0"'
+    elif xml_type == 'QBPOSXML':
+        xml_version = 'qbposxml version="1.0"'
+    return f'<?xml version="1.0"?><?{xml_version}?>'
+
+
+def random_string(length=10):
+    letters = string.ascii_lowercase + string.ascii_uppercase
+    return ''.join(random.choice(letters) for i in range(length))
+
+
+def get_xml_type():
     # FIXME: Should be dependant on realm not on settings.py
     if DEFAULTS['QB_TYPE'] == "QBFS":
-        xml_type = 'qbxml version="13.0"'
+        xml_type = 'QBXML'
     elif DEFAULTS['QB_TYPE'] == "QBPOS":
-        xml_type = 'qbposxml version="1.0"'
+        xml_type = 'QBPOSXML'
     elif not DEFAULTS['QB_TYPE']:
         raise NotImplementedError(
             f"QB_TYPE not found, Please Check QB_TYPE is present in DEFAULTS dict in settings.py,"
@@ -53,10 +67,4 @@ def get_xml_meta_info():
         raise NotImplementedError(
             f"QB_TYPE not correct, Please Check QB_TYPE in DEFAULTS dict in settings.py,"
             f" acceptable values= ['QBFS', 'QBPOS']")
-
-    return f'<?xml version="1.0"?><?{xml_type}?>'
-
-
-def random_string(length=10):
-    letters = string.ascii_lowercase + string.ascii_uppercase
-    return ''.join(random.choice(letters) for i in range(length))
+    return xml_type

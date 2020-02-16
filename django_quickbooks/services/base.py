@@ -1,6 +1,6 @@
 from django_quickbooks import QUICKBOOKS_ENUMS
 from django_quickbooks.utils import get_xml_meta_info, xml_setter
-from django_quickbooks.settings import DEFAULTS
+from django_quickbooks import utils
 
 
 class Service:
@@ -10,19 +10,7 @@ class Service:
     mod_fields = []
 
     def _prepare_request(self, req_body):
-        # FIXME: Should be dependant on realm not on settings.py
-        if DEFAULTS['QB_TYPE'] == "QBFS":
-            xml_type = "QBXML"
-        elif DEFAULTS['QB_TYPE'] == "QBPOS":
-            xml_type = "QBPOSXML"
-        elif not DEFAULTS['QB_TYPE']:
-            raise NotImplementedError(
-                f"QB_TYPE not found, Please Check QB_TYPE is present in DEFAULTS dict in settings.py,"
-                f" acceptable values= ['QBFS', 'QBPOS']")
-        else:
-            raise NotImplementedError(
-                f"QB_TYPE not correct, Please Check QB_TYPE in DEFAULTS dict in settings.py,"
-                f" acceptable values= ['QBFS', 'QBPOS']")
+        xml_type = utils.get_xml_type()
         xml = xml_setter(f'{xml_type}MsgsRq', req_body, onError='stopOnError')
         xml = xml_setter(xml_type, xml)
 
