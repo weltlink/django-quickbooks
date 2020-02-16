@@ -4,6 +4,7 @@ from spyne.server.django import DjangoView
 
 from django_quickbooks.views import QuickBooksService, Support
 
+app_name = "django_quickbooks"
 urlpatterns = [
     path('quickbooks-desktop/support/', Support.as_view()),
     path('quickbooks-desktop/', DjangoView.as_view(
@@ -13,4 +14,3 @@ urlpatterns = [
         out_protocol=Soap11())
          ),
 ]
-
