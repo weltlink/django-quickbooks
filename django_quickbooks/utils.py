@@ -3,6 +3,7 @@ import string
 from importlib import import_module
 
 from django.utils.six import string_types
+from django_quickbooks.settings import DEFAULTS
 
 
 def import_callable(path_or_callable):
@@ -39,7 +40,21 @@ def xml_setter(name, value, encode=False, **options):
 
 
 def get_xml_meta_info():
-    return '<?xml version="1.0"?><?qbxml version="13.0"?>'
+    # FIXME: Should be dependant on realm not on settings.py
+    if DEFAULTS['QB_TYPE'] == "QBFS":
+        xml_type = 'qbxml version="13.0"'
+    elif DEFAULTS['QB_TYPE'] == "QBPOS":
+        xml_type = 'qbposxml version="1.0"'
+    elif not DEFAULTS['QB_TYPE']:
+        raise NotImplementedError(
+            f"QB_TYPE not found, Please Check QB_TYPE is present in DEFAULTS dict in settings.py,"
+            f" acceptable values= ['QBFS', 'QBPOS']")
+    else:
+        raise NotImplementedError(
+            f"QB_TYPE not correct, Please Check QB_TYPE in DEFAULTS dict in settings.py,"
+            f" acceptable values= ['QBFS', 'QBPOS']")
+
+    return f'<?xml version="1.0"?><?{xml_type}?>'
 
 
 def random_string(length=10):

@@ -36,7 +36,7 @@ DEFAULTS = {
     'APP_ID': '',
     'APP_NAME': 'Some App',
     'APP_DESCRIPTION': 'Some App Description',
-    'QB_TYPE': 'QBFS',
+    'QB_TYPE': 'QBPOS',
     'OWNER_ID': '{1ee58da6-3051-11ea-b499-9cda3ea7afc1}',
 
     'LOCAL_MODEL_CLASSES': {
