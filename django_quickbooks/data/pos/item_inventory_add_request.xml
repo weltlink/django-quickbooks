@@ -1,0 +1,174 @@
+<?xml version="1.0" ?>
+<!-- ========================================================================== -->
+<!-- ItemInventoryAddRq.xml                                                         -->
+<!--                                                                            -->
+<!-- INTUIT CONFIDENTIAL.                                                       -->
+<!-- Copyright (c) 2001-2009 Intuit Inc. All rights reserved.                   -->
+<!-- Use is subject to the terms specified at:                                  -->
+<!--          http://developer.intuit.com/legal/devsite_tos.html                -->
+<!--                                                                            -->
+<!--                                                                            -->
+<!-- ========================================================================== -->
+<!-- Summary: Sample illustrating the account query request.                    -->
+<!-- This XML file contains a single request to query accounts.                 -->
+<!--                                                                            -->
+<!-- Description:                                                               -->
+<!-- A sample qbposXML request for use with SDKTest samples so that you can see -->
+<!-- the response from QB POS and verify that the QB POS Request Processor is   -->
+<!-- behaving appropriately.   -->
+<!-- ========================================================================== -->
+<!-- Language: xml                                                            -->
+<!-- Structure: qbposXML                                                            -->
+<!-- QuickBooks: any                                                            -->
+<!-- Deployment: any                                                            -->
+<!-- ========================================================================== -->
+<?qbposxml version="1.0"?>
+<QBPOSXML>
+    <QBPOSXMLMsgsRq onError="stopOnError">
+        <ItemInventoryAddRq requestID="7">
+            <ItemInventoryAdd>
+                <ListID>IDTYPE</ListID>                             <!-- may be macro value -->
+                <ALU>STRTYPE</ALU>                                  <!-- opt, field max = 20 -->
+                <Attribute>STRTYPE</Attribute>                      <!-- opt, field max = 12 -->
+                <COGSAccount>STRTYPE</COGSAccount>                  <!-- opt -->
+                <Cost>AMTTYPE</Cost>                                <!-- opt -->
+                <DepartmentListID>IDTYPE</DepartmentListID>         <!-- opt, may be macro value -->
+                <Desc1>STRTYPE</Desc1>                              <!-- opt, field max = 30 -->
+                <Desc2>STRTYPE</Desc2>                              <!-- opt -->
+                <IncomeAccount>STRTYPE</IncomeAccount>              <!-- opt -->
+                <IsEligibleForCommission>BOOLTYPE</IsEligibleForCommission> <!-- opt -->
+                <IsPrintingTags>BOOLTYPE</IsPrintingTags>           <!-- opt -->
+                <IsUnorderable>BOOLTYPE</IsUnorderable>             <!-- opt -->
+                <IsEligibleForRewards>BOOLTYPE</IsEligibleForRewards> <!-- opt, v3.0 -->
+                <IsWebItem>BOOLTYPE</IsWebItem>                     <!-- opt, v3.0 -->
+                <!-- ItemType may have one of the following values: Inventory,NonInventory,Service,Assembly,Group,SpecialOrder -->
+                <ItemType>ENUMTYPE</ItemType>                       <!-- opt -->
+                <MarginPercent>INTTYPE</MarginPercent>              <!-- opt -->
+                <MarkupPercent>INTTYPE</MarkupPercent>              <!-- opt -->
+                <MSRP>AMTTYPE</MSRP>                                <!-- opt -->
+                <OnHandStore01>QUANTYPE</OnHandStore01>             <!-- opt -->
+                <OnHandStore02>QUANTYPE</OnHandStore02>             <!-- opt -->
+                <OnHandStore03>QUANTYPE</OnHandStore03>             <!-- opt -->
+                <OnHandStore04>QUANTYPE</OnHandStore04>             <!-- opt -->
+                <OnHandStore05>QUANTYPE</OnHandStore05>             <!-- opt -->
+                <OnHandStore06>QUANTYPE</OnHandStore06>             <!-- opt -->
+                <OnHandStore07>QUANTYPE</OnHandStore07>             <!-- opt -->
+                <OnHandStore08>QUANTYPE</OnHandStore08>             <!-- opt -->
+                <OnHandStore09>QUANTYPE</OnHandStore09>             <!-- opt -->
+                <OnHandStore10>QUANTYPE</OnHandStore10>             <!-- opt -->
+                <OnHandStore11>QUANTYPE</OnHandStore11>             <!-- opt, v3.0 -->
+                <OnHandStore12>QUANTYPE</OnHandStore12>             <!-- opt, v3.0 -->
+                <OnHandStore13>QUANTYPE</OnHandStore13>             <!-- opt, v3.0 -->
+                <OnHandStore14>QUANTYPE</OnHandStore14>             <!-- opt, v3.0 -->
+                <OnHandStore15>QUANTYPE</OnHandStore15>             <!-- opt, v3.0 -->
+                <OnHandStore16>QUANTYPE</OnHandStore16>             <!-- opt, v3.0 -->
+                <OnHandStore17>QUANTYPE</OnHandStore17>             <!-- opt, v3.0 -->
+                <OnHandStore18>QUANTYPE</OnHandStore18>             <!-- opt, v3.0 -->
+                <OnHandStore19>QUANTYPE</OnHandStore19>             <!-- opt, v3.0 -->
+                <OnHandStore20>QUANTYPE</OnHandStore20>             <!-- opt, v3.0 -->
+                <ReorderPointStore01>QUANTYPE</ReorderPointStore01> <!-- opt, v3.0 -->
+                <ReorderPointStore02>QUANTYPE</ReorderPointStore02> <!-- opt, v3.0 -->
+                <ReorderPointStore03>QUANTYPE</ReorderPointStore03> <!-- opt, v3.0 -->
+                <ReorderPointStore04>QUANTYPE</ReorderPointStore04> <!-- opt, v3.0 -->
+                <ReorderPointStore05>QUANTYPE</ReorderPointStore05> <!-- opt, v3.0 -->
+                <ReorderPointStore06>QUANTYPE</ReorderPointStore06> <!-- opt, v3.0 -->
+                <ReorderPointStore07>QUANTYPE</ReorderPointStore07> <!-- opt, v3.0 -->
+                <ReorderPointStore08>QUANTYPE</ReorderPointStore08> <!-- opt, v3.0 -->
+                <ReorderPointStore09>QUANTYPE</ReorderPointStore09> <!-- opt, v3.0 -->
+                <ReorderPointStore10>QUANTYPE</ReorderPointStore10> <!-- opt, v3.0 -->
+                <ReorderPointStore11>QUANTYPE</ReorderPointStore11> <!-- opt, v3.0 -->
+                <ReorderPointStore12>QUANTYPE</ReorderPointStore12> <!-- opt, v3.0 -->
+                <ReorderPointStore13>QUANTYPE</ReorderPointStore13> <!-- opt, v3.0 -->
+                <ReorderPointStore14>QUANTYPE</ReorderPointStore14> <!-- opt, v3.0 -->
+                <ReorderPointStore15>QUANTYPE</ReorderPointStore15> <!-- opt, v3.0 -->
+                <ReorderPointStore16>QUANTYPE</ReorderPointStore16> <!-- opt, v3.0 -->
+                <ReorderPointStore17>QUANTYPE</ReorderPointStore17> <!-- opt, v3.0 -->
+                <ReorderPointStore18>QUANTYPE</ReorderPointStore18> <!-- opt, v3.0 -->
+                <ReorderPointStore19>QUANTYPE</ReorderPointStore19> <!-- opt, v3.0 -->
+                <ReorderPointStore20>QUANTYPE</ReorderPointStore20> <!-- opt, v3.0 -->
+                <OrderByUnit>STRTYPE</OrderByUnit>                  <!-- opt, field max = 20, v2.0 -->
+                <OrderCost>AMTTYPE</OrderCost>                      <!-- opt -->
+                <Price1>AMTTYPE</Price1>                            <!-- opt -->
+                <Price2>AMTTYPE</Price2>                            <!-- opt -->
+                <Price3>AMTTYPE</Price3>                            <!-- opt -->
+                <Price4>AMTTYPE</Price4>                            <!-- opt -->
+                <Price5>AMTTYPE</Price5>                            <!-- opt, v1.1 -->
+                <ReorderPoint>QUANTYPE</ReorderPoint>               <!-- opt -->
+                <SellByUnit>STRTYPE</SellByUnit>                    <!-- opt, field max = 20, v2.0 -->
+                <!-- SerialFlag may have one of the following values: Optional,Prompt -->
+                <SerialFlag>ENUMTYPE</SerialFlag>                   <!-- opt -->
+                <Size>STRTYPE</Size>                                <!-- opt, field max = 12 -->
+                <TaxCode>STRTYPE</TaxCode>                          <!-- opt -->
+                <UnitOfMeasure>STRTYPE</UnitOfMeasure>              <!-- opt, field max = 20, v1.1 -->
+                <UPC>STRTYPE</UPC>                                  <!-- opt, field max = 18 -->
+                <VendorListID>IDTYPE</VendorListID>                 <!-- opt, may be macro value -->
+                <WebDesc>STRTYPE</WebDesc>                          <!-- opt, v3.0 -->
+                <WebPrice>AMTTYPE</WebPrice>                        <!-- opt, v3.0 -->
+                <Manufacturer>STRTYPE</Manufacturer>                <!-- opt, field max = 50, v3.0 -->
+                <Weight>FLOATTYPE</Weight>                          <!-- opt, v3.0 -->
+                <Keywords>STRTYPE</Keywords>                        <!-- opt, v3.0 -->
+                <WebCategories>STRTYPE</WebCategories>              <!-- opt, v3.0 -->
+                <UnitOfMeasure1>                                    <!-- opt, v2.0 -->
+                    <ALU>STRTYPE</ALU>                                <!-- opt, field max = 20 -->
+                    <MSRP>AMTTYPE</MSRP>                              <!-- opt -->
+                    <NumberOfBaseUnits>QUANTYPE</NumberOfBaseUnits>   <!-- opt -->
+                    <Price1>AMTTYPE</Price1>                          <!-- opt -->
+                    <Price2>AMTTYPE</Price2>                          <!-- opt -->
+                    <Price3>AMTTYPE</Price3>                          <!-- opt -->
+                    <Price4>AMTTYPE</Price4>                          <!-- opt -->
+                    <Price5>AMTTYPE</Price5>                          <!-- opt -->
+                    <UnitOfMeasure>STRTYPE</UnitOfMeasure>            <!-- opt, field max = 20 -->
+                    <UPC>STRTYPE</UPC>                                <!-- opt, field max = 18 -->
+                </UnitOfMeasure1>
+                <UnitOfMeasure2>                                    <!-- opt, v2.0 -->
+                    <ALU>STRTYPE</ALU>                                <!-- opt, field max = 20 -->
+                    <MSRP>AMTTYPE</MSRP>                              <!-- opt -->
+                    <NumberOfBaseUnits>QUANTYPE</NumberOfBaseUnits>   <!-- opt -->
+                    <Price1>AMTTYPE</Price1>                          <!-- opt -->
+                    <Price2>AMTTYPE</Price2>                          <!-- opt -->
+                    <Price3>AMTTYPE</Price3>                          <!-- opt -->
+                    <Price4>AMTTYPE</Price4>                          <!-- opt -->
+                    <Price5>AMTTYPE</Price5>                          <!-- opt -->
+                    <UnitOfMeasure>STRTYPE</UnitOfMeasure>            <!-- opt, field max = 20 -->
+                    <UPC>STRTYPE</UPC>                                <!-- opt, field max = 18 -->
+                </UnitOfMeasure2>
+                <UnitOfMeasure3>                                    <!-- opt, v2.0 -->
+                    <ALU>STRTYPE</ALU>                                <!-- opt, field max = 20 -->
+                    <MSRP>AMTTYPE</MSRP>                              <!-- opt -->
+                    <NumberOfBaseUnits>QUANTYPE</NumberOfBaseUnits>   <!-- opt -->
+                    <Price1>AMTTYPE</Price1>                          <!-- opt -->
+                    <Price2>AMTTYPE</Price2>                          <!-- opt -->
+                    <Price3>AMTTYPE</Price3>                          <!-- opt -->
+                    <Price4>AMTTYPE</Price4>                          <!-- opt -->
+                    <Price5>AMTTYPE</Price5>                          <!-- opt -->
+                    <UnitOfMeasure>STRTYPE</UnitOfMeasure>            <!-- opt, field max = 20 -->
+                    <UPC>STRTYPE</UPC>                                <!-- opt, field max = 18 -->
+                </UnitOfMeasure3>
+                <VendorInfo2>                                       <!-- opt -->
+                    <ALU>STRTYPE</ALU>                                <!-- opt, field max = 20 -->
+                    <OrderCost>AMTTYPE</OrderCost>                    <!-- opt -->
+                    <UPC>STRTYPE</UPC>                                <!-- opt, field max = 18 -->
+                    <VendorListID>IDTYPE</VendorListID>               <!-- may be macro value -->
+                </VendorInfo2>
+                <VendorInfo3>                                       <!-- opt -->
+                    <ALU>STRTYPE</ALU>                                <!-- opt, field max = 20 -->
+                    <OrderCost>AMTTYPE</OrderCost>                    <!-- opt -->
+                    <UPC>STRTYPE</UPC>                                <!-- opt, field max = 18 -->
+                    <VendorListID>IDTYPE</VendorListID>               <!-- may be macro value -->
+                </VendorInfo3>
+                <VendorInfo4>                                       <!-- opt -->
+                    <ALU>STRTYPE</ALU>                                <!-- opt, field max = 20 -->
+                    <OrderCost>AMTTYPE</OrderCost>                    <!-- opt -->
+                    <UPC>STRTYPE</UPC>                                <!-- opt, field max = 18 -->
+                    <VendorListID>IDTYPE</VendorListID>               <!-- may be macro value -->
+                </VendorInfo4>
+                <VendorInfo5>                                       <!-- opt -->
+                    <ALU>STRTYPE</ALU>                                <!-- opt, field max = 20 -->
+                    <OrderCost>AMTTYPE</OrderCost>                    <!-- opt -->
+                    <UPC>STRTYPE</UPC>                                <!-- opt, field max = 18 -->
+                    <VendorListID>IDTYPE</VendorListID>               <!-- may be macro value -->
+                </VendorInfo5>         <!-- opt,field max = 18 -->
+            </ItemInventoryAdd>
+        </ItemInventoryAddRq>
+    </QBPOSXMLMsgsRq>
+</QBPOSXML>
