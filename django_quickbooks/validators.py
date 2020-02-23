@@ -74,6 +74,12 @@ def float_type_validator(value):
                               ValidationCode.INVALID_TYPE)
 
 
+def int_type_validator(value):
+    if not isinstance(value, int):
+        raise ValidationError(VALIDATION_MESSAGES[ValidationCode.INVALID_TYPE] % (type(value), int),
+                              ValidationCode.INVALID_TYPE)
+
+
 def required_validator(value, required=False):
     if not value and required:
         raise ValidationError(VALIDATION_MESSAGES[ValidationCode.REQUIRED], ValidationCode.REQUIRED)
@@ -92,6 +98,7 @@ class SchemeValidator:
     BOOLTYPE = 'BOOLTYPE'
     OBJTYPE = 'OBJTYPE'
     FLOATTYPE = 'FLOATTYPE'
+    INTTYPE = 'INTTYPE'
 
     type_validators = dict(
         STRTYPE=str_type_validator,
@@ -100,6 +107,7 @@ class SchemeValidator:
         BOOLTYPE=bool_type_validator,
         OBJTYPE=obj_type_validator,
         FLOATTYPE=float_type_validator,
+        INTTYPE=int_type_validator,
     )
     option_validators = dict(
         min_length=min_length_validator,

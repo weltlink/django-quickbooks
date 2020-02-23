@@ -18,6 +18,7 @@ class RealmMixin(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid4)
     name = models.CharField(max_length=155)
     password = models.CharField(max_length=128, null=True)
+    qb_type = models.CharField(max_length=5, choices=[('QBFS', 'QBFS'), ('QBPOS', 'QBPOS'), ('QBO', 'QBO')])
 
     objects = RealmQuerySet.as_manager()
 
@@ -66,11 +67,17 @@ class QBDTaskMixin(models.Model):
     class Meta:
         abstract = True
 
+    @property
+    def realm(self):
+        raise NotImplementedError(
+            "'realm' field is required, please add ForeignKey field representing your Realm model")
+
     objects = QBDTaskQuerySet.as_manager()
 
     def get_request(self):
         obj_class = import_object_cls(self.qb_resource)
         service = obj_class.get_service()()
+        service.qb_type = self.realm.qb_type  # to generate proper XML
         obj = self.content_object if self.content_type and self.object_id else None
 
         if self.qb_operation == QUICKBOOKS_ENUMS.OPP_QR:

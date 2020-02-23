@@ -9,29 +9,36 @@ class Service:
     complex_fields = []
     mod_fields = []
 
+    @property
+    def qb_type(self):
+        raise NotImplementedError("qb_type is a required")
+
     def _prepare_request(self, req_body):
-        xml_type = utils.get_xml_type()
+        xml_type = utils.get_xml_type(self.qb_type)
         xml = xml_setter(f'{xml_type}MsgsRq', req_body, onError='stopOnError')
         xml = xml_setter(xml_type, xml)
 
-        xml = get_xml_meta_info() + xml
+        xml = get_xml_meta_info(self.qb_type) + xml
         return xml
 
     def _add(self, resource, object):
         xml = ''
         xml += xml_setter(resource + QUICKBOOKS_ENUMS.OPP_ADD + 'Rq', object.as_xml(
-            opp_type=QUICKBOOKS_ENUMS.OPP_ADD, ref_fields=self.ref_fields, change_fields=self.add_fields, complex_fields=self.complex_fields))
+            opp_type=QUICKBOOKS_ENUMS.OPP_ADD, ref_fields=self.ref_fields, change_fields=self.add_fields,
+            complex_fields=self.complex_fields))
         return self._prepare_request(xml)
 
     def _update(self, resource, object):
         xml = ''
         xml += xml_setter(resource + QUICKBOOKS_ENUMS.OPP_MOD + 'Rq', object.as_xml(
-            opp_type=QUICKBOOKS_ENUMS.OPP_MOD, ref_fields=self.ref_fields, change_fields=self.mod_fields, complex_fields=self.complex_fields))
+            opp_type=QUICKBOOKS_ENUMS.OPP_MOD, ref_fields=self.ref_fields, change_fields=self.mod_fields,
+            complex_fields=self.complex_fields))
         return self._prepare_request(xml)
 
     def _void(self, resource, object):
         xml = ''
-        xml += xml_setter(resource + QUICKBOOKS_ENUMS.OPP_VOID + 'Rq', object.as_xml(opp_type=QUICKBOOKS_ENUMS.OPP_VOID))
+        xml += xml_setter(resource + QUICKBOOKS_ENUMS.OPP_VOID + 'Rq',
+                          object.as_xml(opp_type=QUICKBOOKS_ENUMS.OPP_VOID))
         return self._prepare_request(xml)
 
     def _delete(self, resource, object):

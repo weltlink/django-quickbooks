@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!-- ========================================================================== -->
-<!-- CustomerAddRq.xml                                                         -->
+<!-- DepartmentAddRq.xml                                                         -->
 <!--                                                                            -->
 <!-- INTUIT CONFIDENTIAL.                                                       -->
 <!-- Copyright (c) 2001-2009 Intuit Inc. All rights reserved.                   -->
@@ -14,7 +14,7 @@
 <!--                                                                            -->
 <!-- Description:                                                               -->
 <!-- A sample qbposXML request for use with SDKTest samples so that you can see -->
-<!-- the response from QB POS and verify that the QB POS Request Processor is -->
+<!-- the response from QB POS and verify that the QB POS Request Processor is   -->
 <!-- behaving appropriately.   -->
 <!-- ========================================================================== -->
 <!-- Language: xml                                                            -->
@@ -24,34 +24,15 @@
 <!-- ========================================================================== -->
 <?qbposxml version="1.0"?>
 <QBPOSXML>
-  <QBPOSXMLMsgsRq onError="stopOnError">
-    <CustomerAddRq requestID = "26">
-      <CustomerAdd>
-        <CompanyName>CompanyName</CompanyName>                  <!-- opt, field max = 40 -->
-        <!-- CustomerDiscType may have one of the following values: None,PriceLevel,Percentage -->
-	<CustomerDiscType>PriceLevel</CustomerDiscType>       <!-- opt -->
-        <EMail>EMail</EMail>                              <!-- opt, field max = 99 -->
-        <FirstName>Young</FirstName>                      <!-- opt, field max = 30 -->
-        <LastName>Yuk</LastName>                        <!-- field max = 30 -->
-        <Notes>Notes</Notes>                              <!-- opt, field max = 245 -->
-        <Phone>Phone</Phone>                              <!-- opt, field max = 21 -->
-        <Phone2>Phone2</Phone2>                        <!-- opt, field max = 21 -->
-        <!-- PriceLevelNumber may have one of the following values: 1,2,3,4 -->
-        <PriceLevelNumber>1</PriceLevelNumber>       <!-- opt -->
-        <Salutation>Mr</Salutation>                    <!-- opt, field max = 15 -->
-        <BillAddress>                                       <!-- opt -->
-		<City>City</City> 
-  		<PostalCode>PostalCode</PostalCode> 
-  		<State>State</State> 
-  		<Street>BillAddr1</Street> 
-  	</BillAddress>
-        <ShipAddress>                                       <!-- opt -->
-  		<City>City</City> 
-  		<PostalCode>PostalCode</PostalCode> 
-  		<State>CA</State> 
-  		<Street>ShipAddr1</Street> 
-      </ShipAddress>
-      </CustomerAdd>
-    </CustomerAddRq>
-  </QBPOSXMLMsgsRq>
+    <QBPOSXMLMsgsRq onError="stopOnError">
+        <DepartmentAddRq requestID="65">
+            <DepartmentAdd>
+                <DefaultMarginPercent>INTTYPE</DefaultMarginPercent> <!-- opt -->
+                <DefaultMarkupPercent>INTTYPE</DefaultMarkupPercent> <!-- opt -->
+                <DepartmentCode>STRTYPE</DepartmentCode>            <!-- field max = 3 -->
+                <DepartmentName>STRTYPE</DepartmentName>            <!-- opt, field max = 30 -->
+                <TaxCode>STRTYPE</TaxCode>                          <!-- opt -->
+            </DepartmentAdd>
+        </DepartmentAddRq>
+    </QBPOSXMLMsgsRq>
 </QBPOSXML>

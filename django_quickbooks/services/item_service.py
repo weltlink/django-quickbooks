@@ -3,6 +3,8 @@ from django_quickbooks.services.base import Service
 
 
 class ServiceOfItemService(Service):
+    qb_type = None
+
     def all(self):
         return self._all(QUICKBOOKS_ENUMS.RESOURCE_ITEM_SERVICE)
 
