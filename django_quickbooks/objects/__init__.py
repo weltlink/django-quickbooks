@@ -35,3 +35,6 @@ from django_quickbooks.objects.customer_pos import \
 
 from django_quickbooks.objects.item_inventory_pos import \
     ItemInventory
+
+from django_quickbooks.objects.department_pos import \
+    Department
