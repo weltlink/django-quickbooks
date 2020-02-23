@@ -14,16 +14,16 @@ class ResponseProcessor:
     op_type = None
     obj_class = None
 
-    def __init__(self, response, hresult, message):
+    def __init__(self, response, hresult, message, realm):
         self._actual_response_type = None
         self._response_body = None
         self._response = response
         self.hresult = hresult
         self.message = message
-        self._process()
+        self._process(realm.qb_type)
 
-    def _process(self):
-        xml_type = utils.get_xml_type()
+    def _process(self, qb_type):
+        xml_type = utils.get_xml_type(qb_type)
         if self.hresult:
             raise QBXMLStatusError(self.message)
         qbxml_root = etree.fromstring(self._response)

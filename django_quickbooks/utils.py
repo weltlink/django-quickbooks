@@ -39,8 +39,8 @@ def xml_setter(name, value, encode=False, **options):
     return '<%s>%s</%s>' % (name, value, name) if not option_xml else '<%s %s>%s</%s>' % (name, option_xml, value, name)
 
 
-def get_xml_meta_info():
-    xml_type = get_xml_type()
+def get_xml_meta_info(qb_type):
+    xml_type = get_xml_type(qb_type)
     if xml_type == 'QBXML':
         xml_version = 'qbxml version="13.0"'
     elif xml_type == 'QBPOSXML':
@@ -53,18 +53,21 @@ def random_string(length=10):
     return ''.join(random.choice(letters) for i in range(length))
 
 
-def get_xml_type():
-    # FIXME: Should be dependant on realm not on settings.py
-    if DEFAULTS['QB_TYPE'] == "QBFS":
+def get_xml_type(qb_type: str) -> str:
+    """
+    :param qb_type: qb_type from realm object values should be in ['QBFS', 'QBPOS', 'QBO']
+    :return: 'QBXML' or 'QBPOSXML'
+    """
+    if qb_type == "QBFS":
         xml_type = 'QBXML'
-    elif DEFAULTS['QB_TYPE'] == "QBPOS":
+    elif qb_type == "QBPOS":
         xml_type = 'QBPOSXML'
-    elif not DEFAULTS['QB_TYPE']:
+    elif not qb_type:
         raise NotImplementedError(
-            f"QB_TYPE not found, Please Check QB_TYPE is present in DEFAULTS dict in settings.py,"
+            f"qb_type not found, Please Check qb_type in your realm model"
             f" acceptable values= ['QBFS', 'QBPOS']")
     else:
         raise NotImplementedError(
-            f"QB_TYPE not correct, Please Check QB_TYPE in DEFAULTS dict in settings.py,"
-            f" acceptable values= ['QBFS', 'QBPOS']")
+            f"qb_type not correct, Please Check qb_type in your realm model,"
+            f"'{qb_type}' is not acceptable. acceptable values= ['QBFS', 'QBPOS']")
     return xml_type

@@ -3,6 +3,7 @@ from django_quickbooks.services.base import Service
 
 
 class DepartmentService(Service):
+    qb_type = None
 
     def add(self, object):
         return self._add(QUICKBOOKS_ENUMS.RESOURCE_DEPARTMENT, object)
