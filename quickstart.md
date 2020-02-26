@@ -7,8 +7,8 @@ Run migrations: `manage.py makemigrations` , `manage.py migrate`
 
 ### Create a new record in django_quickbooks_realm
 You should create a new realm for each of your users.  
-We will do that from django shell.  
-`manage.py shell` and follow these instructions
+We will do that from the django shell.  
+Execute the command `manage.py shell` and follow these instructions:
 
 ```python
 from django_quickbooks.models import Realm
@@ -41,13 +41,13 @@ You need also to install RabbitMQ, which is a widely known message broker,
 you can find instructions on how to install RabbitMQ Here [https://www.rabbitmq.com/download.html]
 
 ### Implementation
-Add `django_quickbooks` to your installed apps in `settings.py`
-Add this line to your `urls.py`  
-`path(r'^qwc/', include("django_quickbooks.urls")),`
+Add `django_quickbooks` to your installed apps in `settings.py`.  
+Add the following line to `urlspatterns` list inside `urls.py`:  
 
-Add the `QBDModelMixin` to the model that you want to sync to QB or QBPOS.
-Make sure to add these 2 methods: `to_qbd_obj()` and `from_qbd_obj()` to your model, so django_quickbooks
-can communicate with your model
+`path(r'^qwc/', include("django_quickbooks.urls"))`
+
+Inherit the `QBDModelMixin` to the model that you want to sync with QB or QBPOS.
+Make sure to add and implement these 2 methods: `to_qbd_obj()` and `from_qbd_obj()` inside your model, so that django_quickbooks can communicate with your project model
 
 ```python
 from django_quickbooks.models import QBDModelMixin
@@ -62,6 +62,7 @@ class Customer(models.Model, QBDModelMixin):
     zip = models.CharField(max_length=255, blank=True, null=True)
     city = models.CharField(max_length=255, blank=True, null=True)
     state = models.CharField(max_length=255, blank=True, null=True)
+    
     def to_qbd_obj(self, **fields):
         from django_quickbooks.objects import Customer as QBCustomer
         # map your fields to the qbd_obj fields
