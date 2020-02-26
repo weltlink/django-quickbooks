@@ -63,15 +63,26 @@ class Customer(models.Model, QBDModelMixin):
     city = models.CharField(max_length=255, blank=True, null=True)
     state = models.CharField(max_length=255, blank=True, null=True)
     
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}'
+	
     def to_qbd_obj(self, **fields):
         from django_quickbooks.objects import Customer as QBCustomer
         # map your fields to the qbd_obj fields
         return QBCustomer(Name=self.__str__(),
                           IsActive=True,
-                          FirstName=self.first_name,
-                          LastName=self.last_name,
                           Phone=self.phone,
                           )
+
+    @classmethod			  
+    def from_qbd_obj(cls, qbd_obj):
+    	# map qbd_obj fields to your model fields
+        return cls(
+            first_name=qbd_obj.Name,
+	    phone=qbd_obj.Phone,
+            qbd_object_id=qbd_obj.ListID,
+            qbd_object_version=qbd_obj.EditSequence
+        )
 ```
 
 
