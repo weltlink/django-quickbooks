@@ -45,3 +45,21 @@ def get_xml_meta_info():
 def random_string(length=10):
     letters = string.ascii_lowercase + string.ascii_uppercase
     return ''.join(random.choice(letters) for i in range(length))
+
+
+def convert_qbd_model_to_qbdtask(obj, qb_resource, qb_operation=None, **kwargs):
+    from django_quickbooks import QUICKBOOKS_ENUMS
+    from django.contrib.contenttypes.models import ContentType
+
+    if not qb_operation:
+        if obj.is_qbd_obj_created:
+            qb_operation = QUICKBOOKS_ENUMS.OPP_MOD
+        else:
+            qb_operation = QUICKBOOKS_ENUMS.OPP_ADD
+
+        return dict(
+            qb_operation=qb_operation,
+            qb_resource=qb_resource,
+            object_id=obj.id,
+            content_type=ContentType.objects.get_for_model(obj),
+        )

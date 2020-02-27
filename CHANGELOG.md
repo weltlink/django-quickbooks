@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### ADDED
 
+- Add converter from qbd_mixin_model to qbd_task
 - Add signal to handle post_process after realm is authenticated successfully
 
 ## [0.6.3] - 2020-02-14
