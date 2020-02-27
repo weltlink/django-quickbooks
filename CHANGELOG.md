@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [NOT RELEASED] - 2020-02-26
+## [0.6.4] - 2020-02-26
 
 ### ADDED
 
@@ -40,3 +40,4 @@ All notable changes to this project will be documented in this file.
 
 [0.6.0]: https://github.com/weltlink/django-quickbooks/compare/0.5...0.6
 [0.6.3]: https://github.com/weltlink/django-quickbooks/compare/0.6...0.6.3
+[0.6.4]: https://github.com/weltlink/django-quickbooks/compare/0.6.3...0.6.4
