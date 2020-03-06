@@ -11,7 +11,7 @@ integration support for <b>Python 3.6+</b> and <b>Django 2.0+</b>
 </div>
 
 
-| Version:  | 0.6.4                                                                                                                |
+| Version:  | 0.6.4.1                                                                                                                |
 |-----------|--------------------------------------------------------------------------------------------------------------------|
 | Download: | https://pypi.org/project/django-quickbooks/                                                                        |
 | Source:   | https://github.com/weltlink/django-quickbooks/                                                                     |
