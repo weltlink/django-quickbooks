@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.4.2] - 2020-03-09
+
+### FIXED
+
+- Fix logger handling to django default
+- Fix is_list method of validators
+- Fix validate method of SchemeValidator when many option is enabled
+
 ## [0.6.4.1] - 2020-03-06
 
 ### FIXED
@@ -52,3 +60,4 @@ All notable changes to this project will be documented in this file.
 [0.6.3]: https://github.com/weltlink/django-quickbooks/compare/0.6...0.6.3
 [0.6.4]: https://github.com/weltlink/django-quickbooks/compare/0.6.3...0.6.4
 [0.6.4.1]: https://github.com/weltlink/django-quickbooks/compare/0.6.4...0.6.4.1
+[0.6.4.2]: https://github.com/weltlink/django-quickbooks/compare/0.6.4.1...0.6.4.2

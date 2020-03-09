@@ -1,5 +1,7 @@
 import logging
 
+logger = logging.getLogger('django')
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from lxml import etree
@@ -37,10 +39,9 @@ class SessionManager(BaseSessionManager, RabbitMQManager):
             try:
                 self.publish_message(qb_task.get_request(), str(realm.id))
             except QbException as exc:
-                logger = logging.getLogger('django.request')
                 logger.error(exc.detail)
-            except ObjectDoesNotExist:
-                pass
+            except ObjectDoesNotExist as e:
+                logger.error(e)
 
         queryset.delete()
 
@@ -58,11 +59,9 @@ class SessionManager(BaseSessionManager, RabbitMQManager):
                     break
 
             except QBXMLParseError as exc:
-                logger = logging.getLogger('django.request')
                 logger.error(exc.detail)
                 return -1
             except QBXMLStatusError as exc:
-                logger = logging.getLogger('django.request')
                 logger.error(exc.detail)
                 return -1
 

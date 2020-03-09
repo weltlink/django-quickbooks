@@ -29,9 +29,7 @@ def operation_type(value):
 
 
 def is_list(value):
-    if not isinstance(value, list):
-        raise ValidationError(VALIDATION_MESSAGES[ValidationCode.INVALID_TYPE] % (type(value), str),
-                              ValidationCode.INVALID_TYPE)
+    return isinstance(value, list)
 
 
 def str_type_validator(value):
@@ -127,7 +125,7 @@ class SchemeValidator:
         if many:
             for single_value in value:
                 try:
-                    self.validate(single_value, **options)
+                    self.validate(field_name, single_value, **options)
                 except ValidationError as exc:
                     errors.append(exc.detail)
 
