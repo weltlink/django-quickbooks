@@ -5,6 +5,7 @@ from spyne.service import ServiceBase
 
 from django_quickbooks import QBWC_CODES, HIGHEST_SUPPORTING_QBWC_VERSION, \
     get_session_manager
+from django_quickbooks.signals import realm_authenticated
 
 
 class QuickBooksService(ServiceBase):
@@ -23,6 +24,7 @@ class QuickBooksService(ServiceBase):
         return_array = []
         realm = session_manager.authenticate(username=strUserName, password=strPassword)
         if realm and realm.is_active:
+            realm_authenticated.send(sender=realm.__class__, realm=realm)
             if not session_manager.in_session(realm):
                 session_manager.add_new_jobs(realm)
                 if session_manager.new_jobs(realm):

@@ -71,3 +71,21 @@ def get_xml_type(qb_type: str) -> str:
             f"qb_type not correct, Please Check qb_type in your realm model,"
             f"'{qb_type}' is not acceptable. acceptable values= ['QBFS', 'QBPOS']")
     return xml_type
+
+
+def convert_qbd_model_to_qbdtask(obj, qb_resource, qb_operation=None, **kwargs):
+    from django_quickbooks import QUICKBOOKS_ENUMS
+    from django.contrib.contenttypes.models import ContentType
+
+    if not qb_operation:
+        if obj.is_qbd_obj_created:
+            qb_operation = QUICKBOOKS_ENUMS.OPP_MOD
+        else:
+            qb_operation = QUICKBOOKS_ENUMS.OPP_ADD
+
+        return dict(
+            qb_operation=qb_operation,
+            qb_resource=qb_resource,
+            object_id=obj.id,
+            content_type=ContentType.objects.get_for_model(obj),
+        )

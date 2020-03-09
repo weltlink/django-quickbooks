@@ -22,7 +22,7 @@ copyright = '2020, Bedilbek Khamidov'
 author = 'Bedilbek Khamidov'
 
 # The full version, including alpha/beta/rc tags
-release = '0.6.3'
+release = '0.6.4.2'
 
 
 # -- General configuration ---------------------------------------------------

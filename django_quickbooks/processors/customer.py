@@ -20,7 +20,7 @@ class CustomerQueryResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
             local_customer = None
             if customer.ListID:
                 local_customer = self.find_by_list_id(customer.ListID)
-            elif not local_customer and customer.Name:
+            if not local_customer and customer.Name:
                 local_customer = self.find_by_name(customer.Name)
 
             if local_customer:
