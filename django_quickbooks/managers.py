@@ -24,6 +24,9 @@ class RealmSessionQuerySet(models.QuerySet):
     def close_session(self, realm):
         self.filter(realm=realm, ended_at__isnull=True).update(ended_at=timezone.now())
 
+    def get_by(self, realm):
+        return self.filter(realm=realm, ended_at__isnull=True).get()
+
 
 class QBDTaskQuerySet(models.QuerySet):
     pass

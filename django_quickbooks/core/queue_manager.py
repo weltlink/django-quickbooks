@@ -1,24 +1,18 @@
-from abc import abstractmethod
 
 
 class QueueManager:
 
-    @abstractmethod
-    def get_message(self, queue_name, ack=True):
-        pass
+    def get_message(self, queue_name, **kwargs):
+        raise NotImplemented
 
-    @abstractmethod
-    def publish_message(self, msg, queue_name, delete_queue=False):
-        pass
+    def publish_message(self, msg, queue_name, **kwargs):
+        raise NotImplemented
 
-    @abstractmethod
-    def get_queue_message_count(self, queue_name):
-        pass
+    def get_message_count(self, queue_name):
+        raise NotImplemented
 
-    @abstractmethod
-    def delete_queue(self, queue_name):
-        pass
+    def delete(self, queue_name):
+        raise NotImplemented
 
-    @abstractmethod
-    def purge_queue(self, queue_name):
-        pass
+    def purge(self, queue_name):
+        raise NotImplemented

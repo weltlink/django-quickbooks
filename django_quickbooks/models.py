@@ -6,6 +6,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.utils import timezone
 from lxml import etree
 
 from django_quickbooks import qbwc_settings, QUICKBOOKS_ENUMS
@@ -49,6 +50,10 @@ class RealmSessionMixin(models.Model):
     ended_at = models.DateTimeField(null=True)
 
     objects = RealmSessionQuerySet.as_manager()
+
+    def close(self):
+        self.ended_at = timezone.now()
+        self.save()
 
     class Meta:
         abstract = True

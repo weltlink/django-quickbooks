@@ -7,10 +7,6 @@ HIGHEST_SUPPORTING_QBWC_VERSION = '2.2.0.34'
 default_app_config = 'django_quickbooks.apps.DjangoQuickbooksConfig'
 
 
-def get_session_manager():
-    return qbwc_settings.SESSION_MANAGER_CLASS()
-
-
 class QBWC_CODES:
     NONE = 'none'  # no work to do for the service
     BUSY = 'busy'  # service is busy with other task
@@ -59,6 +55,14 @@ class QBXML_RESPONSE_STATUS_CODES:
     INVALID_DATE = '3020'
     INVALID_DATE_RANGE = '3030'
     NAME_IS_NOT_UNIQUE = '3100'
+
+
+def get_session_manager_class():
+    return qbwc_settings.SESSION_MANAGER_CLASS
+
+
+def get_queue_manager_class():
+    return qbwc_settings.QUEUE_MANAGER_CLASS
 
 
 def get_processors():

@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [NO_RELEASE]
+
+Sorry to say that, but from this release no backward compatibility is kept with previous ones as I had to change 
+lots of concepts in the project
+
+ ### CHANGED
+ - `QueueManager` instance has been changed from inherited model to composite model for `SessionManager`
+ - `RabbitMQManager` (`QueueManager`) is being *deprecated* now as I could not implement it in the right way
+ and it keeps being disconnected from the broker which could be a huge problem for big projects
+ - `RedisManager` (`QueueManager`) is added to compensate deprecation of RabbitMQManager
+ - Added named queue prefixes to differentiate queues (e.g. **iterating realm_session requests**, **realm requests**)
+ - Added customization for `QueueManager` without changing `SessionManager` (changing `QUEUE_MANAGER_CLASS` in settings)
+ 
+ 
 ## [0.6.4.2] - 2020-03-09
 
 ### FIXED
@@ -61,3 +75,4 @@ All notable changes to this project will be documented in this file.
 [0.6.4]: https://github.com/weltlink/django-quickbooks/compare/0.6.3...0.6.4
 [0.6.4.1]: https://github.com/weltlink/django-quickbooks/compare/0.6.4...0.6.4.1
 [0.6.4.2]: https://github.com/weltlink/django-quickbooks/compare/0.6.4.1...0.6.4.2
+[NO_RELEASE]: https://github.com/weltlink/django-quickbooks/compare/0.6.4.2...master
