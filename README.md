@@ -56,6 +56,7 @@ integration support for <b>Python 3.6+</b> and <b>Django 2.0+</b>
  * Python 3.6+
  * Django 2.0+
  * RabbitMQ (or reimplementation of QueueManager)
+ * Redis (or reimplementation of QueueManager)
  * Celery (for handling asynchronous tasks)
 
 
@@ -67,7 +68,7 @@ Soap server for Quickbooks Web Connector is built on top of Spyne and Lxml.
 ### Installation
 `pip install django-quickbooks`
 
-You can run `pip install django-quickbooks pika spyne celery` to install all of the dependencies.
+You can run `pip install django-quickbooks pika spyne celery redis` to install all of the dependencies.
 
 Run migrations: `manage.py makemigrations` , `manage.py migrate`
 
