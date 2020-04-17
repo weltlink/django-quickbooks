@@ -66,8 +66,16 @@ Soap server for Quickbooks Web Connector is built on top of Spyne and Lxml.
 
 ## Setup & Documentation
 ### Installation
-`pip install django-quickbooks`
-
+Installation from pypi: 
+```shell script
+pip install django-quickbooks
+```  
+OR
+  
+Installation from source (github): 
+```shell script
+pip install -e git+https://github.com/weltlink/django-quickbooks.git@master#egg=django-quickbooks
+````   
 You can run `pip install django-quickbooks pika spyne celery redis` to install all of the dependencies.
 
 Run migrations: `manage.py makemigrations` , `manage.py migrate`
@@ -104,8 +112,15 @@ enter the realm password for this user
 
 
 ### RabbitMQ
-You need also to install RabbitMQ, which is a widely known message broker, 
-you can find instructions on how to install RabbitMQ Here [https://www.rabbitmq.com/download.html]
+You need to install RabbitMQ (if you want to use default QueueManager) which is a widely known message broker. 
+However, RabbitMQ implementation of QueueManager is being deprecated as it could not be implemented in the right way to 
+keep robust connection, instead it is recommended to use Redis. You can find instructions on how to install RabbitMQ 
+[here](https://www.rabbitmq.com/download.html).
+
+### Redis
+You can also install Redis (as an alternative to RabbitMQ implementation of QueueManager) which is a widely 
+known as in-memory data structure. You can find instructions on how to install Redis 
+[here](https://redis.io/topics/quickstart).
 
 ### Implementation
 Add `django_quickbooks` to your installed apps in `settings.py`.  
