@@ -170,6 +170,9 @@ class QuickBooksService(ServiceBase):
         if hresult:
             print("hresult=" + hresult)
             print("message=" + message)
+        # FIXME: I know this is a hacky way to get around encoding, needs a better solution
+        if response.startswith('<?xml version="1.0" encoding="windows-1252"?>'):
+            response = response.replace('encoding="windows-1252"', '', 1)
 
         return session_manager.process_response(ticket, response, hresult, message)
 

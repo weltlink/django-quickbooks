@@ -8,6 +8,7 @@ class InvoiceService(Service):
     add_fields = ['InvoiceLine']
     complex_fields = ['BillAddress']
     mod_fields = ['InvoiceLine']
+    qb_type = None
 
     def add(self, object):
         return self._add(QUICKBOOKS_ENUMS.RESOURCE_INVOICE, object)

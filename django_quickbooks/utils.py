@@ -3,6 +3,7 @@ import string
 from importlib import import_module
 
 from django.utils.six import string_types
+from django_quickbooks.settings import DEFAULTS
 
 
 def import_callable(path_or_callable):
@@ -38,13 +39,38 @@ def xml_setter(name, value, encode=False, **options):
     return '<%s>%s</%s>' % (name, value, name) if not option_xml else '<%s %s>%s</%s>' % (name, option_xml, value, name)
 
 
-def get_xml_meta_info():
-    return '<?xml version="1.0"?><?qbxml version="13.0"?>'
+def get_xml_meta_info(qb_type):
+    xml_type = get_xml_type(qb_type)
+    if xml_type == 'QBXML':
+        xml_version = 'qbxml version="13.0"'
+    elif xml_type == 'QBPOSXML':
+        xml_version = 'qbposxml version="1.0"'
+    return f'<?xml version="1.0"?><?{xml_version}?>'
 
 
 def random_string(length=10):
     letters = string.ascii_lowercase + string.ascii_uppercase
     return ''.join(random.choice(letters) for i in range(length))
+
+
+def get_xml_type(qb_type: str) -> str:
+    """
+    :param qb_type: qb_type from realm object values should be in ['QBFS', 'QBPOS', 'QBO']
+    :return: 'QBXML' or 'QBPOSXML'
+    """
+    if qb_type == "QBFS":
+        xml_type = 'QBXML'
+    elif qb_type == "QBPOS":
+        xml_type = 'QBPOSXML'
+    elif not qb_type:
+        raise NotImplementedError(
+            f"qb_type not found, Please Check qb_type in your realm model"
+            f" acceptable values= ['QBFS', 'QBPOS']")
+    else:
+        raise NotImplementedError(
+            f"qb_type not correct, Please Check qb_type in your realm model,"
+            f"'{qb_type}' is not acceptable. acceptable values= ['QBFS', 'QBPOS']")
+    return xml_type
 
 
 def convert_qbd_model_to_qbdtask(obj, qb_resource, qb_operation=None, **kwargs):

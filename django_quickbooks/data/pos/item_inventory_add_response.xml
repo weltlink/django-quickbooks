@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<QBPOSXML>
+    <QBPOSXMLMsgsRs>
+        <ItemInventoryAddRs statusCode="0" statusMessage="Status OK" statusSeverity="Info">
+            <ItemInventoryRet>
+                <ListID>4830375467175280897</ListID>
+                <TimeModified>2020-02-21T17:50:02+02:00</TimeModified>
+                <Cost>1.00</Cost>
+                <DepartmentCode>SYS</DepartmentCode>
+                <DepartmentListID>1000000001</DepartmentListID>
+                <Desc1>Long Sleeve. Collared</Desc1>
+                <Desc2>Clothing. Toddler. Tops. Long Sleeve. Collared.</Desc2>
+                <IsBelowReorder>False</IsBelowReorder>
+                <IsEligibleForCommission>True</IsEligibleForCommission>
+                <IsPrintingTags>True</IsPrintingTags>
+                <IsUnorderable>False</IsUnorderable>
+                <ItemNumber>15</ItemNumber>
+                <ItemType>Inventory</ItemType>
+                <MarginPercent>75</MarginPercent>
+                <MarkupPercent>300</MarkupPercent>
+                <MSRP>0.00</MSRP>
+                <OnHandStore01>1.00</OnHandStore01>
+                <OrderCost>0.00</OrderCost>
+                <Price1>4.00</Price1>
+                <Price2>3.60</Price2>
+                <Price3>3.60</Price3>
+                <Price4>3.60</Price4>
+                <QuantityOnHand>1.00</QuantityOnHand>
+                <QuantityOnOrder>0.00</QuantityOnOrder>
+                <ReorderPoint>0.00</ReorderPoint>
+                <SerialFlag>Optional</SerialFlag>
+                <StoreExchangeStatus>Modified</StoreExchangeStatus>
+                <TaxCode>Tax</TaxCode>
+                <VendorInfo2>
+                    <OrderCost>0.00</OrderCost>
+                </VendorInfo2>
+                <VendorInfo3>
+                    <OrderCost>0.00</OrderCost>
+                </VendorInfo3>
+                <VendorInfo4>
+                    <OrderCost>0.00</OrderCost>
+                </VendorInfo4>
+                <VendorInfo5>
+                    <OrderCost>0.00</OrderCost>
+                </VendorInfo5>
+            </ItemInventoryRet>
+        </ItemInventoryAddRs>
+    </QBPOSXMLMsgsRs>
+</QBPOSXML>

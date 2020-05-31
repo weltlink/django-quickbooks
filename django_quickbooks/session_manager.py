@@ -64,7 +64,7 @@ class SessionManager(BaseSessionManager):
         processors = get_processors()
         for processor in processors:
             try:
-                processed = processor(response, hresult, message).process(realm)
+                processed = processor(response, hresult, message, realm).process(realm)
                 if processed:
                     break
 

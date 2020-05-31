@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<!-- ========================================================================== -->
+<!-- DepartmentAddRq.xml                                                         -->
+<!--                                                                            -->
+<!-- INTUIT CONFIDENTIAL.                                                       -->
+<!-- Copyright (c) 2001-2009 Intuit Inc. All rights reserved.                   -->
+<!-- Use is subject to the terms specified at:                                  -->
+<!--          http://developer.intuit.com/legal/devsite_tos.html                -->
+<!--                                                                            -->
+<!--                                                                            -->
+<!-- ========================================================================== -->
+<!-- Summary: Sample illustrating the account query request.                    -->
+<!-- This XML file contains a single request to query accounts.                 -->
+<!--                                                                            -->
+<!-- Description:                                                               -->
+<!-- A sample qbposXML request for use with SDKTest samples so that you can see -->
+<!-- the response from QB POS and verify that the QB POS Request Processor is   -->
+<!-- behaving appropriately.   -->
+<!-- ========================================================================== -->
+<!-- Language: xml                                                            -->
+<!-- Structure: qbposXML                                                            -->
+<!-- QuickBooks: any                                                            -->
+<!-- Deployment: any                                                            -->
+<!-- ========================================================================== -->
+<?qbposxml version="1.0"?>
+<QBPOSXML>
+    <QBPOSXMLMsgsRq onError="stopOnError">
+        <DepartmentAddRq requestID="65">
+            <DepartmentAdd>
+                <DefaultMarginPercent>INTTYPE</DefaultMarginPercent> <!-- opt -->
+                <DefaultMarkupPercent>INTTYPE</DefaultMarkupPercent> <!-- opt -->
+                <DepartmentCode>STRTYPE</DepartmentCode>            <!-- field max = 3 -->
+                <DepartmentName>STRTYPE</DepartmentName>            <!-- opt, field max = 30 -->
+                <TaxCode>STRTYPE</TaxCode>                          <!-- opt -->
+            </DepartmentAdd>
+        </DepartmentAddRq>
+    </QBPOSXMLMsgsRq>
+</QBPOSXML>

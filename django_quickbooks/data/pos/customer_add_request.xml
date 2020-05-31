@@ -1,0 +1,77 @@
+<?xml version="1.0" ?>
+<!-- ========================================================================== -->
+<!-- CustomerAddRq.xml                                                         -->
+<!--                                                                            -->
+<!-- INTUIT CONFIDENTIAL.                                                       -->
+<!-- Copyright (c) 2001-2009 Intuit Inc. All rights reserved.                   -->
+<!-- Use is subject to the terms specified at:                                  -->
+<!--          http://developer.intuit.com/legal/devsite_tos.html                -->
+<!--                                                                            -->
+<!--                                                                            -->
+<!-- ========================================================================== -->
+<!-- Summary: Sample illustrating the account query request.                    -->
+<!-- This XML file contains a single request to query accounts.                 -->
+<!--                                                                            -->
+<!-- Description:                                                               -->
+<!-- A sample qbposXML request for use with SDKTest samples so that you can see -->
+<!-- the response from QB POS and verify that the QB POS Request Processor is -->
+<!-- behaving appropriately.   -->
+<!-- ========================================================================== -->
+<!-- Language: xml                                                            -->
+<!-- Structure: qbposXML                                                            -->
+<!-- QuickBooks: any                                                            -->
+<!-- Deployment: any                                                            -->
+<!-- ========================================================================== -->
+<?qbposxml version="1.0"?>
+<QBPOSXML>
+  <QBPOSXMLMsgsRq onError="stopOnError">
+    <CustomerAddRq requestID = "26">
+      <CustomerAdd>
+<CompanyName>STRTYPE</CompanyName>                  <!-- opt, field max = 41 -->
+        <CustomerID>STRTYPE</CustomerID>                    <!-- opt, field max = 40, v2.5 -->
+        <CustomerDiscPercent>FLOATTYPE</CustomerDiscPercent> <!-- opt -->
+        <!-- CustomerDiscType may have one of the following values: None,PriceLevel,Percentage -->
+        <CustomerDiscType>ENUMTYPE</CustomerDiscType>       <!-- opt -->
+        <CustomerType>STRTYPE</CustomerType>                <!-- opt, field max = 15, v1.1 -->
+        <EMail>STRTYPE</EMail>                              <!-- opt, field max = 99 -->
+        <IsOkToEMail>BOOLTYPE</IsOkToEMail>                 <!-- opt, v3.0 -->
+        <FirstName>STRTYPE</FirstName>                      <!-- opt, field max = 30 -->
+        <IsAcceptingChecks>BOOLTYPE</IsAcceptingChecks>     <!-- opt -->
+        <IsUsingChargeAccount>BOOLTYPE</IsUsingChargeAccount> <!-- opt, v2.0 -->
+        <IsUsingWithQB>BOOLTYPE</IsUsingWithQB>             <!-- opt -->
+        <IsRewardsMember>BOOLTYPE</IsRewardsMember>         <!-- opt, v2.5 -->
+        <IsNoShipToBilling>BOOLTYPE</IsNoShipToBilling>     <!-- opt, v2.5 -->
+        <LastName>STRTYPE</LastName>                        <!-- field max = 30 -->
+        <Notes>STRTYPE</Notes>                              <!-- opt, field max = 245 -->
+        <Phone>STRTYPE</Phone>                              <!-- opt, field max = 40 -->
+        <Phone2>STRTYPE</Phone2>                            <!-- opt, field max = 40 -->
+        <Phone3>STRTYPE</Phone3>                            <!-- opt, field max = 40, v1.1 -->
+        <Phone4>STRTYPE</Phone4>                            <!-- opt, field max = 40, v1.1 -->
+        <!-- PriceLevelNumber may have one of the following values: 1,2,3,4,5 -->
+        <PriceLevelNumber>ENUMTYPE</PriceLevelNumber>       <!-- opt -->
+        <Salutation>STRTYPE</Salutation>                    <!-- opt, field max = 15 -->
+        <TaxCategory>STRTYPE</TaxCategory>                  <!-- opt, field max = 20 -->
+        <BillAddress>                                       <!-- opt -->
+          <City>STRTYPE</City>                              <!-- opt, field max = 31 -->
+          <Country>STRTYPE</Country>                        <!-- opt, field max = 31, v1.1 -->
+          <PostalCode>STRTYPE</PostalCode>                  <!-- opt, field max = 13 -->
+          <State>STRTYPE</State>                            <!-- opt, field max = 21 -->
+          <Street>STRTYPE</Street>                          <!-- opt, field max = 41 -->
+          <Street2>STRTYPE</Street2>                        <!-- opt, field max = 41, v3.0 -->
+        </BillAddress>
+        <DefaultShipAddress>STRTYPE</DefaultShipAddress>    <!-- opt, field max = 32, v2.5 -->
+        <ShipAddress>                                       <!-- opt, may rep -->
+          <AddressName>STRTYPE</AddressName>                <!-- opt, field max = 32, v2.5 -->
+          <CompanyName>STRTYPE</CompanyName>                <!-- opt, field max = 41, v2.5 -->
+          <FullName>STRTYPE</FullName>                      <!-- opt, field max = 64, v2.5 -->
+          <City>STRTYPE</City>                              <!-- opt, field max = 31 -->
+          <Country>STRTYPE</Country>                        <!-- opt, field max = 32, v1.1 -->
+          <PostalCode>STRTYPE</PostalCode>                  <!-- opt, field max = 13 -->
+          <State>STRTYPE</State>                            <!-- opt, field max = 21 -->
+          <Street>STRTYPE</Street>                          <!-- opt, field max = 41 -->
+          <Street2>STRTYPE</Street2>                        <!-- opt, field max = 41, v3.0 -->
+        </ShipAddress>
+      </CustomerAdd>
+    </CustomerAddRq>
+  </QBPOSXMLMsgsRq>
+</QBPOSXML>
