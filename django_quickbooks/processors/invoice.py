@@ -1,16 +1,15 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 
-from django_quickbooks import QUICKBOOKS_ENUMS, qbwc_settings
-from django_quickbooks.objects.invoice import Invoice
+from django_quickbooks import QUICKBOOKS_ENUMS
+from django_quickbooks.models import Invoice
+from django_quickbooks.objects.invoice import Invoice as QBDInvoice
 from django_quickbooks.processors.base import ResponseProcessor, ResponseProcessorMixin
-
-LocalInvoice = qbwc_settings.LOCAL_MODEL_CLASSES['Invoice']
 
 
 class InvoiceAddResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
-    local_model_class = LocalInvoice
-    obj_class = Invoice
+    local_model_class = Invoice
+    obj_class = QBDInvoice
 
     resource = QUICKBOOKS_ENUMS.RESOURCE_INVOICE
     op_type = QUICKBOOKS_ENUMS.OPP_ADD
@@ -45,16 +44,16 @@ class InvoiceAddResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
 
 
 class InvoiceModResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
-    local_model_class = LocalInvoice
-    obj_class = Invoice
+    local_model_class = Invoice
+    obj_class = QBDInvoice
 
     resource = QUICKBOOKS_ENUMS.RESOURCE_INVOICE
     op_type = QUICKBOOKS_ENUMS.OPP_MOD
 
 
 class InvoiceQueryResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
-    local_model_class = LocalInvoice
-    obj_class = Invoice
+    local_model_class = Invoice
+    obj_class = QBDInvoice
 
     resource = QUICKBOOKS_ENUMS.RESOURCE_INVOICE
     op_type = QUICKBOOKS_ENUMS.OPP_QR

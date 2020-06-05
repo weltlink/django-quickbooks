@@ -6,6 +6,7 @@ from django_quickbooks.validators import SchemeValidator
 class ItemService(BaseObject):
     fields = dict(
         ListID=dict(validator=dict(type=SchemeValidator.IDTYPE)),
+        EditSequence=dict(validator=dict(type=SchemeValidator.STRTYPE)),
         Name=dict(validator=dict(type=SchemeValidator.STRTYPE)),
         FullName=dict(validator=dict(type=SchemeValidator.STRTYPE)),
         Parent=dict(validator=dict(type=SchemeValidator.OBJTYPE)),

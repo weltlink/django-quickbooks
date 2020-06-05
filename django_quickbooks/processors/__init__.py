@@ -12,4 +12,6 @@ from django_quickbooks.processors.invoice import \
     InvoiceModResponseProcessor
 
 from django_quickbooks.processors.item_service import \
-    ItemServiceQueryResponseProcessor
+    ItemServiceQueryResponseProcessor, \
+    ItemServiceAddResponseProcessor, \
+    ItemServiceModResponseProcessor

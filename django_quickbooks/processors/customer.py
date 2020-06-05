@@ -1,15 +1,14 @@
-from django_quickbooks import QUICKBOOKS_ENUMS, qbwc_settings
-from django_quickbooks.objects.customer import Customer
+from django_quickbooks import QUICKBOOKS_ENUMS
+from django_quickbooks.models import Customer
+from django_quickbooks.objects.customer import Customer as QBDCustomer
 from django_quickbooks.processors.base import ResponseProcessor, ResponseProcessorMixin
-
-LocalCustomer = qbwc_settings.LOCAL_MODEL_CLASSES['Customer']
 
 
 class CustomerQueryResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
     resource = QUICKBOOKS_ENUMS.RESOURCE_CUSTOMER
     op_type = QUICKBOOKS_ENUMS.OPP_QR
-    local_model_class = LocalCustomer
-    obj_class = Customer
+    local_model_class = Customer
+    obj_class = QBDCustomer
 
     def process(self, realm):
         cont = super().process(realm)
@@ -33,8 +32,8 @@ class CustomerQueryResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
 class CustomerAddResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
     resource = QUICKBOOKS_ENUMS.RESOURCE_CUSTOMER
     op_type = QUICKBOOKS_ENUMS.OPP_ADD
-    local_model_class = LocalCustomer
-    obj_class = Customer
+    local_model_class = Customer
+    obj_class = QBDCustomer
 
     def process(self, realm):
         cont = super().process(realm)
@@ -54,8 +53,8 @@ class CustomerAddResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
 class CustomerModResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
     resource = QUICKBOOKS_ENUMS.RESOURCE_CUSTOMER
     op_type = QUICKBOOKS_ENUMS.OPP_MOD
-    local_model_class = LocalCustomer
-    obj_class = Customer
+    local_model_class = Customer
+    obj_class = QBDCustomer
 
     def process(self, realm):
         cont = super().process(realm)

@@ -16,11 +16,13 @@ def test_create_invoice_with_validation_error():
             IsPending=12345,
             DueDate=12345,
             Memo=12345,
-            AltPhone=1234,
-            Fax=1234,
-            Email=1234,
-            Contact=1234,
-            AltContact=1234
+            Customer=Customer(
+                AltPhone=1234,
+                Fax=1234,
+                Email=1234,
+                Contact=1234,
+                AltContact=1234
+            )
         )
 
 
@@ -40,7 +42,7 @@ def test_create_invoice(
         Customer=Customer(**sample_customer_data),
         InvoiceLine=[
             InvoiceLine(**sample_invoice_line1_data, Item=ItemService(**sample_invoice_item_service1_data)),
-            InvoiceLine(**sample_invoice_item_service2_data, Item=ItemService(**sample_invoice_item_service2_data))
+            InvoiceLine(**sample_invoice_line2_data, Item=ItemService(**sample_invoice_item_service2_data))
         ]
     )
 

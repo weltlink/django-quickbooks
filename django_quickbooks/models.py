@@ -1,18 +1,23 @@
 from abc import abstractmethod
+from itertools import starmap
 from uuid import uuid4, uuid1
 
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils import timezone
 from lxml import etree
+from django_quickbooks.objects.customer import Customer as QBDCustomer
+from django_quickbooks.objects.address import BillAddress as QBDBillAddress
+from django_quickbooks.objects.invoice import Invoice as QBDInvoice
 
 from django_quickbooks import qbwc_settings, QUICKBOOKS_ENUMS
 from django_quickbooks.exceptions import QBOperationNotFound
 from django_quickbooks.managers import RealmQuerySet, RealmSessionQuerySet, QBDTaskQuerySet
-from django_quickbooks.objects import import_object_cls
+from django_quickbooks.objects import import_object_cls, ItemService as QBDItemService, InvoiceLine as QBDInvoiceLine
 
 
 class RealmMixin(models.Model):
@@ -128,6 +133,7 @@ class QBDModelMixin(models.Model):
     qbd_object_id = models.CharField(max_length=127, unique=True, null=True, editable=False)
     qbd_object_updated_at = models.DateTimeField(null=True, editable=False)
     qbd_object_version = models.CharField(max_length=127, null=True, editable=False)
+    realm = models.ForeignKey(Realm, on_delete=models.CASCADE, related_name='%(class)ss_realm')
 
     class Meta:
         abstract = True
@@ -143,6 +149,164 @@ class QBDModelMixin(models.Model):
     @classmethod
     def from_qbd_obj(cls, qbd_obj):
         return None
+
+
+class Customer(QBDModelMixin):
+    id = models.CharField(max_length=36, primary_key=True, blank=False, editable=False)
+    full_name = models.CharField(max_length=100, null=True)
+    name = models.CharField(max_length=41, null=True)
+    is_active = models.BooleanField(default=True)
+    time_created = models.DateTimeField(null=True)
+    time_modified = models.DateTimeField(null=True)
+    edit_sequence = models.CharField(max_length=127, null=True)
+    company_name = models.CharField(max_length=41, null=True)
+    phone = models.CharField(max_length=21, null=True)
+    alt_phone = models.CharField(max_length=21, null=True)
+    fax = models.CharField(max_length=21, null=True)
+    email = models.EmailField(null=True)
+    contact = models.CharField(max_length=41, null=True)
+    alt_contact = models.CharField(max_length=41, null=True)
+    external_id = models.CharField(max_length=36, null=True)
+    external_updated_at = models.DateTimeField(null=True)
+
+    def to_qbd_obj(self, **fields):
+        if fields:
+            data = dict(
+                starmap(lambda key, value: (key, getattr(self, value)), fields.items())
+            )
+        else:
+            data = dict(
+                Name=self.name,
+                IsActive=self.is_active,
+            )
+            if self.is_qbd_obj_created:
+                data.update(
+                    **dict(
+                        ListID=self.qbd_object_id,
+                        EditSequence=self.qbd_object_version
+                    )
+                )
+        return QBDCustomer(**data)
+
+
+class Invoice(QBDModelMixin):
+    id = models.CharField(max_length=36, primary_key=True, blank=False, editable=False)
+    customer = models.OneToOneField(Customer, on_delete=models.CASCADE, related_name='invoice')
+    time_created = models.DateTimeField(null=True)
+    time_modified = models.DateTimeField(null=True)
+    edit_sequence = models.CharField(max_length=127, null=True)
+    txn_date = models.DateField(null=True)
+    is_pending = models.BooleanField(null=True)
+    due_date = models.DateField(null=True)
+    memo = models.TextField(null=True, max_length=4095)
+    external_id = models.CharField(max_length=36, null=True)
+    external_updated_at = models.DateTimeField(null=True)
+
+    def to_qbd_obj(self, create=True, **fields):
+        def get_bill_address(invoice):
+            bill_address = dict(Addr1='', City='', State='', PostalCode='', Country='')
+
+            if hasattr(invoice, 'billaddress'):
+                bill_address.update(
+                    Addr1=invoice.billaddress.addresses.get('Addr1', ''),
+                    City=invoice.billaddress.city or '',
+                    State=invoice.billaddress.state or '',
+                    PostalCode=str(invoice.billaddress.postal_code) or '',
+                    Country=invoice.billaddress.country or '',
+                )
+
+            return QBDBillAddress(**bill_address)
+
+        def get_invoice_lines(invoice):
+            invoice_lines = []
+            for charge in invoice.charges.all():
+                item_group = QBDItemService(ListID=charge.type.qbd_object_id if charge.type.qbd_object_id else '')
+                invoice_lines.append(QBDInvoiceLine(Item=item_group, Quantity=1.00, Rate=float(charge.amount)))
+            return invoice_lines
+
+        data = dict(
+            Customer=self.customer.to_qbd_obj(**dict(ListID='qbd_object_id')),
+            BillAddress=get_bill_address(self),
+            IsPending=self.is_pending,
+            DueDate=self.due_date.isoformat(),
+            InvoiceLine=get_invoice_lines(self),
+        )
+        if self.is_qbd_obj_created:
+            data.update(
+                **dict(
+                    TxnID=self.qbd_object_id,
+                    EditSequence=self.qbd_object_version
+                )
+            )
+
+        return QBDInvoice(**data)
+
+
+class ItemService(QBDModelMixin):
+    id = models.UUIDField(primary_key=True, blank=True, editable=False, default=uuid4)
+    name = models.CharField(max_length=25, null=True, blank=True, unique=True)
+    description = models.TextField(null=True, blank=True)
+
+    def to_qbd_obj(self, **fields):
+        data = dict(
+            Name=self.name
+        )
+        if self.is_qbd_obj_created:
+            data.update(
+                **dict(
+                    ListID=self.qbd_object_id,
+                    EditSequence=self.qbd_object_version
+                )
+            )
+
+        return QBDItemService(**data)
+
+    @classmethod
+    def from_qbd_obj(cls, qbd_obj):
+        return cls(
+            name=qbd_obj.Name,
+            qbd_object_id=qbd_obj.ListID,
+            qbd_object_updated_at=timezone.now() + timezone.timedelta(minutes=1),
+            qbd_object_version=qbd_obj.EditSequence
+        )
+
+
+class InvoiceLine(QBDModelMixin):
+    id = models.UUIDField(primary_key=True, blank=True, editable=False, default=uuid4)
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='charges')
+    type = models.ForeignKey(ItemService, on_delete=models.SET_NULL, null=True, related_name='invoice_charges')
+    amount = models.DecimalField(decimal_places=2, max_digits=8)
+    note = models.TextField(max_length=150, null=True, blank=True)
+    external_id = models.CharField(max_length=36, null=True)
+
+    def to_qbd_obj(self, **fields):
+        pass
+
+
+class ExternalItemService(models.Model):
+    charge_type = models.ForeignKey(ItemService, on_delete=models.CASCADE, related_name='external_item_service')
+    external_item_service_id = models.CharField(max_length=36, null=False, blank=False)
+
+
+class AbstractAddress(models.Model):
+    invoice = models.OneToOneField(Invoice, on_delete=models.CASCADE, related_name='%(class)s')
+    addresses = JSONField(default=dict)
+    city = models.CharField(max_length=31, null=True)
+    state = models.CharField(max_length=21, null=True)
+    postal_code = models.CharField(max_length=13, null=True)
+    country = models.CharField(max_length=31, null=True)
+    note = models.CharField(max_length=41, null=True)
+
+    class Meta:
+        abstract = True
+
+
+class BillAddress(AbstractAddress):
+    pass
+
+
+class ShipAddress(AbstractAddress):
+    pass
 
 
 def create_qwc(realm, **kwargs):
