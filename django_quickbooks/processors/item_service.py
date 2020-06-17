@@ -21,9 +21,9 @@ class ItemServiceAddResponseProcessor(ResponseProcessor, ResponseProcessorMixin)
             item_service = self.obj_class.from_lxml(item_service_ret)
             local_item_service = None
             if item_service.ListID:
-                local_item_service = self.find_by_list_id(item_service.ListID)
+                local_item_service = self.find_by_list_id(item_service.ListID, realm.id)
             if not local_item_service and item_service.Name:
-                local_item_service = self.find_by_name(item_service.Name)
+                local_item_service = self.find_by_name(item_service.Name, realm.id)
 
             if local_item_service:
                 self.update(local_item_service, item_service)
@@ -47,9 +47,9 @@ class ItemServiceModResponseProcessor(ResponseProcessor, ResponseProcessorMixin)
             item_service = self.obj_class.from_lxml(item_service_ret)
             local_item_service = None
             if item_service.ListID:
-                local_item_service = self.find_by_list_id(item_service.ListID)
+                local_item_service = self.find_by_list_id(item_service.ListID, realm.id)
             elif not local_item_service and item_service.Name:
-                local_item_service = self.find_by_name(item_service.Name)
+                local_item_service = self.find_by_name(item_service.Name, realm.id)
 
             if local_item_service:
                 self.update(local_item_service, item_service)
@@ -72,13 +72,13 @@ class ItemServiceQueryResponseProcessor(ResponseProcessor, ResponseProcessorMixi
             item_service = self.obj_class.from_lxml(item_service_ret)
             local_item_service = None
             if item_service.ListID:
-                local_item_service = self.find_by_list_id(item_service.ListID)
+                local_item_service = self.find_by_list_id(item_service.ListID, realm.id)
             if not local_item_service and item_service.Name:
-                local_item_service = self.find_by_name(item_service.Name)
+                local_item_service = self.find_by_name(item_service.Name, realm.id)
 
             if local_item_service:
                 self.update(local_item_service, item_service)
             else:
-                self.create(item_service)
+                self.create(item_service, realm.id)
 
         return True

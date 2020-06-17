@@ -3,6 +3,14 @@ from django_quickbooks.services.base import Service
 
 
 class ServiceOfItemService(Service):
+    ref_fields = ['Account']
+    add_fields = []
+    mod_fields = []
+    complex_fields = ['SalesOrPurchase']
+
+    def add(self, object):
+        return self._add(QUICKBOOKS_ENUMS.RESOURCE_ITEM_SERVICE, object)
+
     def all(self):
         return self._all(QUICKBOOKS_ENUMS.RESOURCE_ITEM_SERVICE)
 

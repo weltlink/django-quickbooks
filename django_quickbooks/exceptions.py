@@ -67,3 +67,7 @@ class QBObjectNotImplemented(QbException):
 
 class QBObjectServiceNotImplemented(QbException):
     pass
+
+
+class QBItemServiceNotMapped(QbException):
+    pass

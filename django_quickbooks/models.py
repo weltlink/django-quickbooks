@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from itertools import starmap
 from uuid import uuid4, uuid1
 
@@ -10,18 +9,30 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils import timezone
 from lxml import etree
-from django_quickbooks.objects.customer import Customer as QBDCustomer
-from django_quickbooks.objects.address import BillAddress as QBDBillAddress
-from django_quickbooks.objects.invoice import Invoice as QBDInvoice
 
 from django_quickbooks import qbwc_settings, QUICKBOOKS_ENUMS
 from django_quickbooks.exceptions import QBOperationNotFound
 from django_quickbooks.managers import RealmQuerySet, RealmSessionQuerySet, QBDTaskQuerySet
-from django_quickbooks.objects import import_object_cls, ItemService as QBDItemService, InvoiceLine as QBDInvoiceLine
+from django_quickbooks.objects import import_object_cls, ItemService as QBDItemService, InvoiceLine as QBDInvoiceLine, \
+    Account as QBDAccount
+from django_quickbooks.objects.account import SalesOrPurchase  as QBDSalesOrPurchase
+from django_quickbooks.objects.address import BillAddress as QBDBillAddress
+from django_quickbooks.objects.customer import Customer as QBDCustomer
+from django_quickbooks.objects.invoice import Invoice as QBDInvoice
 
 
-class RealmMixin(models.Model):
+# Below models are concrete implementations of above classes
+# As initially I was working with django-tenant-schemas package I had to convert to that architecture
+# Thus, below models are extended with schema_name concept that is the core of the django-tenant-schemas package:
+# For more information: https://github.com/bernardopires/django-tenant-schemas
+
+# NOTICE: you also find decorators in the package that only work with django-tenant-schemas
+
+
+class Realm(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid4)
+    schema_name = models.CharField(max_length=100, unique=True)
+    is_active = models.BooleanField(default=True)
     name = models.CharField(max_length=155)
     password = models.CharField(max_length=128, null=True)
 
@@ -45,12 +56,10 @@ class RealmMixin(models.Model):
 
         return check_password(raw_password, self.password, setter)
 
-    class Meta:
-        abstract = True
 
-
-class RealmSessionMixin(models.Model):
+class RealmSession(models.Model):
     id = models.UUIDField(verbose_name='Ticket for QBWC session', primary_key=True, editable=False, default=uuid1)
+    realm = models.ForeignKey(Realm, on_delete=models.CASCADE, related_name='sessions')
     created_at = models.DateTimeField(auto_now_add=True)
     ended_at = models.DateTimeField(null=True)
 
@@ -60,21 +69,16 @@ class RealmSessionMixin(models.Model):
         self.ended_at = timezone.now()
         self.save()
 
-    class Meta:
-        abstract = True
 
-
-class QBDTaskMixin(models.Model):
+class QBDTask(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    realm = models.ForeignKey(Realm, on_delete=models.CASCADE, related_name='qb_tasks')
     qb_operation = models.CharField(max_length=25)
     qb_resource = models.CharField(max_length=50)
     object_id = models.CharField(max_length=50, null=True)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     content_object = GenericForeignKey()
     created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        abstract = True
 
     objects = QBDTaskQuerySet.as_manager()
 
@@ -99,66 +103,16 @@ class QBDTaskMixin(models.Model):
             raise QBOperationNotFound
 
 
-# Below models are concrete implementations of above classes
-# As initially I was working with django-tenant-schemas package I had to convert to that architecture
-# Thus, below models are extended with schema_name concept that is the core of the django-tenant-schemas package:
-# For more information: https://github.com/bernardopires/django-tenant-schemas
-
-# NOTICE: you also find decorators in the package that only work with django-tenant-schemas
-
-
-class Realm(RealmMixin):
-    schema_name = models.CharField(max_length=100, unique=True)
-    is_active = models.BooleanField(default=True)
-
-    class Meta:
-        abstract = False
-
-
-class RealmSession(RealmSessionMixin):
-    realm = models.ForeignKey(Realm, on_delete=models.CASCADE, related_name='sessions')
-
-    class Meta:
-        abstract = False
-
-
-class QBDTask(QBDTaskMixin):
-    realm = models.ForeignKey(Realm, on_delete=models.CASCADE, related_name='qb_tasks')
-
-    class Meta:
-        abstract = False
-
-
-class QBDModelMixin(models.Model):
-    qbd_object_id = models.CharField(max_length=127, unique=True, null=True, editable=False)
-    qbd_object_updated_at = models.DateTimeField(null=True, editable=False)
-    qbd_object_version = models.CharField(max_length=127, null=True, editable=False)
-    realm = models.ForeignKey(Realm, on_delete=models.CASCADE, related_name='%(class)ss_realm')
-
-    class Meta:
-        abstract = True
-
-    @property
-    def is_qbd_obj_created(self):
-        return self.qbd_object_id and self.qbd_object_version
-
-    @abstractmethod
-    def to_qbd_obj(self, **fields):
-        pass
-
-    @classmethod
-    def from_qbd_obj(cls, qbd_obj):
-        return None
-
-
-class Customer(QBDModelMixin):
-    id = models.CharField(max_length=36, primary_key=True, blank=False, editable=False)
+class Customer(models.Model):
+    id = models.UUIDField(primary_key=True, blank=True, editable=False, default=uuid4)
+    realm = models.ForeignKey(Realm, on_delete=models.CASCADE, related_name='customers')
+    list_id = models.CharField(max_length=127, unique=True, null=True, editable=False)
+    edit_sequence = models.CharField(max_length=127, null=True, editable=False)
     full_name = models.CharField(max_length=100, null=True)
     name = models.CharField(max_length=41, null=True)
     is_active = models.BooleanField(default=True)
     time_created = models.DateTimeField(null=True)
     time_modified = models.DateTimeField(null=True)
-    edit_sequence = models.CharField(max_length=127, null=True)
     company_name = models.CharField(max_length=41, null=True)
     phone = models.CharField(max_length=21, null=True)
     alt_phone = models.CharField(max_length=21, null=True)
@@ -169,38 +123,58 @@ class Customer(QBDModelMixin):
     external_id = models.CharField(max_length=36, null=True)
     external_updated_at = models.DateTimeField(null=True)
 
+    class Meta:
+        unique_together = ('name', 'realm')
+
+    @property
+    def is_qbd_obj_created(self):
+        return self.list_id and self.edit_sequence
+
     def to_qbd_obj(self, **fields):
         if fields:
             data = dict(
-                starmap(lambda key, value: (key, getattr(self, value)), fields.items())
+                starmap(lambda key, value: (key, getattr(self, value) or ''), fields.items())
             )
         else:
             data = dict(
                 Name=self.name,
                 IsActive=self.is_active,
+                CompanyName=self.company_name or '',
+                Phone=self.phone or '',
+                AltPhone=self.alt_phone or '',
+                Fax=self.fax or '',
+                Email=self.email or '',
+                Contact=self.contact or '',
+                AltContact=self.alt_contact or '',
             )
             if self.is_qbd_obj_created:
                 data.update(
                     **dict(
-                        ListID=self.qbd_object_id,
-                        EditSequence=self.qbd_object_version
+                        ListID=self.list_id or '',
+                        EditSequence=self.edit_sequence
                     )
                 )
         return QBDCustomer(**data)
 
 
-class Invoice(QBDModelMixin):
-    id = models.CharField(max_length=36, primary_key=True, blank=False, editable=False)
+class Invoice(models.Model):
+    id = models.UUIDField(primary_key=True, blank=True, editable=False, default=uuid4)
+    realm = models.ForeignKey(Realm, on_delete=models.CASCADE, related_name='invoices')
+    list_id = models.CharField(max_length=127, unique=True, null=True, editable=False)
+    edit_sequence = models.CharField(max_length=127, null=True, editable=False)
     customer = models.OneToOneField(Customer, on_delete=models.CASCADE, related_name='invoice')
     time_created = models.DateTimeField(null=True)
     time_modified = models.DateTimeField(null=True)
-    edit_sequence = models.CharField(max_length=127, null=True)
     txn_date = models.DateField(null=True)
     is_pending = models.BooleanField(null=True)
     due_date = models.DateField(null=True)
     memo = models.TextField(null=True, max_length=4095)
     external_id = models.CharField(max_length=36, null=True)
     external_updated_at = models.DateTimeField(null=True)
+
+    @property
+    def is_qbd_obj_created(self):
+        return self.list_id and self.edit_sequence
 
     def to_qbd_obj(self, create=True, **fields):
         def get_bill_address(invoice):
@@ -220,12 +194,12 @@ class Invoice(QBDModelMixin):
         def get_invoice_lines(invoice):
             invoice_lines = []
             for charge in invoice.charges.all():
-                item_group = QBDItemService(ListID=charge.type.qbd_object_id if charge.type.qbd_object_id else '')
-                invoice_lines.append(QBDInvoiceLine(Item=item_group, Quantity=1.00, Rate=float(charge.amount)))
+                item_group = QBDItemService(ListID=charge.type.list_id if charge.type.list_id else '')
+                invoice_lines.append(QBDInvoiceLine(Item=item_group, Quantity=1.0, Rate=float(charge.amount)))
             return invoice_lines
 
         data = dict(
-            Customer=self.customer.to_qbd_obj(**dict(ListID='qbd_object_id')),
+            Customer=self.customer.to_qbd_obj(**dict(ListID='list_id')),
             BillAddress=get_bill_address(self),
             IsPending=self.is_pending,
             DueDate=self.due_date.isoformat(),
@@ -234,58 +208,101 @@ class Invoice(QBDModelMixin):
         if self.is_qbd_obj_created:
             data.update(
                 **dict(
-                    TxnID=self.qbd_object_id,
-                    EditSequence=self.qbd_object_version
+                    TxnID=self.list_id,
+                    EditSequence=self.edit_sequence
                 )
             )
 
         return QBDInvoice(**data)
 
 
-class ItemService(QBDModelMixin):
+class ItemService(models.Model):
     id = models.UUIDField(primary_key=True, blank=True, editable=False, default=uuid4)
-    name = models.CharField(max_length=25, null=True, blank=True, unique=True)
+    realm = models.ForeignKey(Realm, on_delete=models.CASCADE, related_name='item_services')
+    list_id = models.CharField(max_length=127, unique=True, null=True, editable=False)
+    edit_sequence = models.CharField(max_length=127, null=True, editable=False)
+    name = models.CharField(max_length=25, null=True, blank=True)
+    account = models.ForeignKey('ServiceAccount', on_delete=models.CASCADE, related_name='item_services')
     description = models.TextField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ('name', 'realm')
+
+    @property
+    def is_qbd_obj_created(self):
+        return self.list_id and self.edit_sequence
 
     def to_qbd_obj(self, **fields):
         data = dict(
-            Name=self.name
+            Name=self.name,
+            IsActive=True,
+            SalesOrPurchase=QBDSalesOrPurchase(Account=QBDAccount(ListID=self.account.list_id))
         )
         if self.is_qbd_obj_created:
             data.update(
                 **dict(
-                    ListID=self.qbd_object_id,
-                    EditSequence=self.qbd_object_version
+                    ListID=self.list_id,
+                    EditSequence=self.edit_sequence
                 )
             )
 
         return QBDItemService(**data)
 
     @classmethod
-    def from_qbd_obj(cls, qbd_obj):
+    def from_qbd_obj(cls, qbd_obj, realm_id=None):
+        print()
         return cls(
+            realm_id=realm_id,
             name=qbd_obj.Name,
-            qbd_object_id=qbd_obj.ListID,
-            qbd_object_updated_at=timezone.now() + timezone.timedelta(minutes=1),
-            qbd_object_version=qbd_obj.EditSequence
+            list_id=qbd_obj.ListID,
+            esit_sequence=qbd_obj.EditSequence
         )
 
 
-class InvoiceLine(QBDModelMixin):
+class ServiceAccount(models.Model):
     id = models.UUIDField(primary_key=True, blank=True, editable=False, default=uuid4)
-    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='charges')
-    type = models.ForeignKey(ItemService, on_delete=models.SET_NULL, null=True, related_name='invoice_charges')
-    amount = models.DecimalField(decimal_places=2, max_digits=8)
-    note = models.TextField(max_length=150, null=True, blank=True)
-    external_id = models.CharField(max_length=36, null=True)
+    realm = models.ForeignKey(Realm, on_delete=models.CASCADE, related_name='service_accounts')
+    list_id = models.CharField(max_length=127, unique=True, null=True, editable=False)
+    edit_sequence = models.CharField(max_length=127, null=True, editable=False)
+    name = models.CharField(max_length=31)
+    full_name = models.CharField(max_length=159, null=True)
+    is_active = models.BooleanField(default=True)
+    parent_id = models.CharField(max_length=127, null=True, editable=False)
+    account_type = models.CharField(max_length=100, null=True)
+    account_number = models.IntegerField(null=True)
 
-    def to_qbd_obj(self, **fields):
-        pass
+    @classmethod
+    def from_qbd_obj(cls, qbd_obj, realm_id=None):
+        return cls(
+            realm_id=realm_id,
+            name=qbd_obj.Name,
+            full_name=qbd_obj.FullName,
+            is_active=qbd_obj.IsActive,
+            parent_id=qbd_obj.ParentRef.ListID if hasattr(qbd_obj, 'ParentRef') else None,
+            account_type=qbd_obj.AccountType,
+            account_number=qbd_obj.AccountNumber,
+            list_id=qbd_obj.ListID,
+            edit_sequence=qbd_obj.EditSequence,
+
+        )
 
 
 class ExternalItemService(models.Model):
     charge_type = models.ForeignKey(ItemService, on_delete=models.CASCADE, related_name='external_item_service')
     external_item_service_id = models.CharField(max_length=36, null=False, blank=False)
+
+    class Meta:
+        unique_together = ('charge_type', 'external_item_service_id')
+
+
+class InvoiceLine(models.Model):
+    id = models.UUIDField(primary_key=True, blank=True, editable=False, default=uuid4)
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='charges')
+    realm = models.ForeignKey(Realm, on_delete=models.CASCADE, related_name='invoice_lines')
+    type = models.ForeignKey(ItemService, on_delete=models.SET_NULL, null=True, related_name='invoice_charges')
+    rate = models.DecimalField(decimal_places=2, max_digits=8)
+    note = models.TextField(max_length=150, null=True, blank=True)
+    external_id = models.CharField(max_length=36, null=True)
 
 
 class AbstractAddress(models.Model):

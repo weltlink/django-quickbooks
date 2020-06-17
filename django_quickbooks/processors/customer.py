@@ -18,9 +18,9 @@ class CustomerQueryResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
             customer = self.obj_class.from_lxml(customer_ret)
             local_customer = None
             if customer.ListID:
-                local_customer = self.find_by_list_id(customer.ListID)
+                local_customer = self.find_by_list_id(customer.ListID, realm.id)
             if not local_customer and customer.Name:
-                local_customer = self.find_by_name(customer.Name)
+                local_customer = self.find_by_name(customer.Name, realm.id)
 
             if local_customer:
                 self.update(local_customer, customer)
@@ -43,7 +43,7 @@ class CustomerAddResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
             customer = self.obj_class.from_lxml(customer_ret)
             local_customer = None
             if customer.Name:
-                local_customer = self.find_by_name(customer.Name)
+                local_customer = self.find_by_name(customer.Name, realm.id)
 
             if local_customer:
                 self.update(local_customer, customer)
@@ -64,9 +64,9 @@ class CustomerModResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
             customer = self.obj_class.from_lxml(customer_ret)
             local_customer = None
             if customer.ListID:
-                local_customer = self.find_by_list_id(customer.ListID)
+                local_customer = self.find_by_list_id(customer.ListID, realm.id)
             elif not local_customer and customer.Name:
-                local_customer = self.find_by_name(customer.Name)
+                local_customer = self.find_by_name(customer.Name, realm.id)
 
             if local_customer:
                 self.update(local_customer, customer)

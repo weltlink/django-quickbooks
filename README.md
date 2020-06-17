@@ -100,7 +100,7 @@ Go to setting.py and change `QB_TYPE = 'QBPOS'` instead of `'QBFS'` in `DEFAULTS
 >this will be changed to a better approach later.
 
 ### QBWC and .qwc file
-Download QBWC from [http://marketplace.intuit.com/webconnector].  
+[Download QBWC from here](https://developer.intuit.com/app/developer/qbdesktop/docs/get-started/get-started-with-quickbooks-web-connector#download-and-install-the-quickbooks-web-connector).  
 >Make sure to use the compatible QBWC versions with your QB Desktop or QB POS version, Note that latest != compatible, 
 you may need an older version to work with your QB solution.
 

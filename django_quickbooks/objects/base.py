@@ -101,6 +101,7 @@ class BaseObject(ABC):
                 FLOATTYPE=lambda x: float(x.text),
                 BOOLTYPE=lambda x: bool(x.text),
                 OBJTYPE=lambda x: import_object_cls(x.tag).from_lxml(x),
+                INTTYPE=lambda x: int(x.text),
             )
             return converters[type](field) if type in converters else None
 

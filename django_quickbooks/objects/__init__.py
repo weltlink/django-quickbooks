@@ -29,3 +29,7 @@ from django_quickbooks.objects.invoice import \
     ItemService, \
     InvoiceLine, \
     Invoice
+
+from django_quickbooks.objects.account import \
+    Account, \
+    SalesOrPurchase

@@ -25,6 +25,9 @@ DEFAULTS = {
         'django_quickbooks.processors.InvoiceAddResponseProcessor',
         'django_quickbooks.processors.InvoiceModResponseProcessor',
         'django_quickbooks.processors.ItemServiceQueryResponseProcessor',
+        'django_quickbooks.processors.ItemServiceAddResponseProcessor',
+        'django_quickbooks.processors.ItemServiceModResponseProcessor',
+        'django_quickbooks.processors.ServiceAccountQueryProcessor',
     ),
 
     'RABBITMQ_DEFAULT_HOST': 'localhost',

@@ -38,7 +38,10 @@ class Service:
 
     def _all(self, resource):
         xml = xml_setter('MaxReturned', 100)
-        xml = xml_setter(resource + QUICKBOOKS_ENUMS.OPP_QR + 'Rq', xml, metaData='NoMetaData', iterator='Start')
+        if resource == QUICKBOOKS_ENUMS.RESOURCE_ACCOUNT:
+            xml = xml_setter(resource + QUICKBOOKS_ENUMS.OPP_QR + 'Rq', xml, metaData='NoMetaData')
+        else:
+            xml = xml_setter(resource + QUICKBOOKS_ENUMS.OPP_QR + 'Rq', xml, metaData='NoMetaData', iterator='Start')
         return self._prepare_request(xml)
 
     def _find_by_id(self, resource, id, field_name='ListID'):

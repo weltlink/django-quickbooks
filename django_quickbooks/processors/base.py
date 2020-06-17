@@ -64,25 +64,24 @@ class ResponseProcessorMixin:
     local_model_class = None
 
     def update(self, local_obj, obj):
-        if local_obj.qbd_object_version != obj.EditSequence:
+        if local_obj.edit_sequence != obj.EditSequence:
             local_obj.name = obj.Name
-            local_obj.qbd_object_id = obj.ListID
-            local_obj.qbd_object_updated_at = timezone.now() + timezone.timedelta(minutes=1)
-            local_obj.qbd_object_version = obj.EditSequence
+            local_obj.list_id = obj.ListID
+            local_obj.edit_sequence = obj.EditSequence
             local_obj.save()
 
-    def find_by_list_id(self, list_id):
+    def find_by_list_id(self, list_id, realm_id):
         try:
-            return self.local_model_class.objects.get(qbd_object_id=list_id)
+            return self.local_model_class.objects.get(list_id=list_id, realm_id=realm_id)
         except ObjectDoesNotExist:
             return None
 
-    def find_by_name(self, name, field_name='name'):
+    def find_by_name(self, name, realm_id, field_name='name'):
         try:
-            return self.local_model_class.objects.get(**{field_name: name})
+            return self.local_model_class.objects.get(**{field_name: name}, realm_id=realm_id)
         except ObjectDoesNotExist:
             return None
 
-    def create(self, obj):
-        customer = self.local_model_class.from_qbd_obj(obj)
+    def create(self, obj, realm_id=None):
+        customer = self.local_model_class.from_qbd_obj(obj, realm_id=realm_id)
         customer.save()

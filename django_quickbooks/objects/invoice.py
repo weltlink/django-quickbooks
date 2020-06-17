@@ -10,6 +10,8 @@ class ItemService(BaseObject):
         Name=dict(validator=dict(type=SchemeValidator.STRTYPE)),
         FullName=dict(validator=dict(type=SchemeValidator.STRTYPE)),
         Parent=dict(validator=dict(type=SchemeValidator.OBJTYPE)),
+        IsActive=dict(validator=dict(type=SchemeValidator.BOOLTYPE)),
+        SalesOrPurchase=dict(required=True, validator=dict(type=SchemeValidator.OBJTYPE)),
     )
 
     @staticmethod

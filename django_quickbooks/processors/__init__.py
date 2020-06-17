@@ -15,3 +15,6 @@ from django_quickbooks.processors.item_service import \
     ItemServiceQueryResponseProcessor, \
     ItemServiceAddResponseProcessor, \
     ItemServiceModResponseProcessor
+
+from django_quickbooks.processors.account import \
+    ServiceAccountQueryProcessor

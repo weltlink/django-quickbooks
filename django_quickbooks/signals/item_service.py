@@ -1,28 +1,27 @@
 from django.contrib.contenttypes.models import ContentType
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from django_quickbooks import QUICKBOOKS_ENUMS
 from django_quickbooks.models import ItemService
-from django_quickbooks.signals import item_service_created, qbd_task_create, item_service_deleted
+from django_quickbooks.signals import qbd_task_create, item_service_deleted
 
 
-@receiver(item_service_created)
-def create_qbd_item_service(sender, model_obj_id, name, realm_id):
-    item_service, created = ItemService.objects.get_or_create(name=name, realm_id=realm_id)
-    item_service.external_item_service.get_or_create(external_item_service_id=model_obj_id)
-
-    if created:
+@receiver(post_save, sender=ItemService)
+def create_qbd_item_service(sender, instance, *args, **kwargs):
+    if kwargs.get('created', False):
         qbd_task_create.send(
             sender=ItemService,
             qb_operation=QUICKBOOKS_ENUMS.OPP_ADD,
             qb_resource=QUICKBOOKS_ENUMS.RESOURCE_ITEM_SERVICE,
-            object_id=item_service.id,
+            object_id=instance.id,
             content_type=ContentType.objects.get_for_model(ItemService),
-            realm_id=realm_id
+            realm_id=instance.realm_id
         )
 
 
 @receiver(item_service_deleted)
-def delete_qbd_item_service(sender, model_obj_id, name, realm_id):
-    item_service: ItemService = ItemService.objects.get(name=name, realm_id=realm_id)
+def delete_qbd_item_service(sender, model_obj_id, realm_id, *args, **kwargs):
+    item_service = ItemService.objects.get(realm_id=realm_id,
+                                           external_item_service__external_item_service_id=model_obj_id)
     item_service.external_item_service.get(external_item_service_id=model_obj_id).delete()
