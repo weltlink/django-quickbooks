@@ -195,7 +195,7 @@ class Invoice(models.Model):
             invoice_lines = []
             for charge in invoice.charges.all():
                 item_group = QBDItemService(ListID=charge.type.list_id if charge.type.list_id else '')
-                invoice_lines.append(QBDInvoiceLine(Item=item_group, Quantity=1.0, Rate=float(charge.amount)))
+                invoice_lines.append(QBDInvoiceLine(Item=item_group, Quantity=1.0, Rate=float(charge.rate)))
             return invoice_lines
 
         data = dict(
@@ -283,7 +283,6 @@ class ServiceAccount(models.Model):
             account_number=qbd_obj.AccountNumber,
             list_id=qbd_obj.ListID,
             edit_sequence=qbd_obj.EditSequence,
-
         )
 
 

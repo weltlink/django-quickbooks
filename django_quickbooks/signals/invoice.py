@@ -41,7 +41,7 @@ def create_qbd_invoice(sender, model_obj, realm_id, customer_name, customer_id, 
         customer = Customer.objects.get(name=customer_name, realm_id=realm_id)
     except ObjectDoesNotExist:
         customer = Customer.objects.create(name=customer_name, external_id=customer_id, realm_id=realm_id)
-        customer_created.send(Customer, qbd_model_mixin_obj=customer, realm_id=realm_id, name=customer_name)
+        customer_created.send(Customer, model_obj_id=customer_id, realm_id=realm_id, name=customer_name)
 
     invoice = Invoice.objects.create(
         customer=customer,
@@ -67,7 +67,7 @@ def create_qbd_invoice(sender, model_obj, realm_id, customer_name, customer_id, 
                 invoice=invoice,
                 realm_id=realm_id,
                 type=item_service,
-                amount=invoice_line['amount'],
+                rate=invoice_line['amount'],
                 external_id=invoice_line['charge_id']
             ))
         InvoiceLine.objects.bulk_create(creations)

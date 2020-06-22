@@ -11,13 +11,15 @@ RealmModel = get_realm_model()
 @receiver(customer_created)
 def create_qbd_customer(sender, model_obj_id, realm_id, name, company_name=None, phone=None, email=None,
                         *args, **kwargs):
-    customer = Customer.objects.create(
+    customer, _ = Customer.objects.get_or_create(
         name=name,
-        company_name=company_name,
-        phone=phone,
-        email=email,
         realm_id=realm_id,
-        external_id=model_obj_id
+        defaults=dict(
+            company_name=company_name,
+            phone=phone,
+            email=email,
+            external_id=model_obj_id
+        )
     )
 
     qbd_task_create.send(
