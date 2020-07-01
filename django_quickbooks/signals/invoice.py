@@ -4,7 +4,8 @@ from django.dispatch import receiver
 
 from django_quickbooks import get_realm_model, QUICKBOOKS_ENUMS
 from django_quickbooks.models import Invoice, Customer, BillAddress, ShipAddress, InvoiceLine, ItemService
-from django_quickbooks.signals import invoice_created, invoice_updated, qbd_task_create, customer_created
+from django_quickbooks.signals import invoice_created, invoice_updated, qbd_task_create, customer_created, \
+    invoice_deleted
 
 RealmModel = get_realm_model()
 
@@ -79,6 +80,7 @@ def update_qbd_invoice(sender, model_obj, realm_id, is_pending, *args, **kwargs)
 
     if invoice:
         invoice.is_pending = is_pending
+        invoice.save()
 
         qbd_task_create.send(
             sender=model_obj.__class__,
@@ -88,3 +90,20 @@ def update_qbd_invoice(sender, model_obj, realm_id, is_pending, *args, **kwargs)
             content_type=ContentType.objects.get_for_model(Invoice),
             realm_id=realm_id,
         )
+
+
+@receiver(invoice_deleted)
+def delete_qbd_invoice(sender, model_obj_id, realm_id, *args, **kwargs):
+    invoice = Invoice.objects.filter(external_id=model_obj_id, realm_id=realm_id).first()
+
+    if invoice:
+        qbd_task_create.send(
+            sender=Invoice,
+            qb_operation=QUICKBOOKS_ENUMS.OPP_VOID,
+            qb_resource=QUICKBOOKS_ENUMS.RESOURCE_INVOICE,
+            object_id=invoice.id,
+            content_type=ContentType.objects.get_for_model(Invoice),
+            realm_id=realm_id,
+        )
+
+        invoice.delete()

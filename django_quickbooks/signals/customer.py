@@ -38,6 +38,7 @@ def update_qbd_customer(sender, model_obj_id, realm_id, name, company_name=None,
     customer = Customer.objects.filter(name=name, realm_id=realm_id, external_id=model_obj_id).first()
 
     if customer:
+        customer.name = name,
         customer.company_name = company_name
         customer.phone = phone
         customer.email = email

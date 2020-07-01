@@ -68,6 +68,8 @@ class ResponseProcessorMixin:
             local_obj.name = obj.Name
             local_obj.list_id = obj.ListID
             local_obj.edit_sequence = obj.EditSequence
+            local_obj.time_created = obj.TimeCreated
+            local_obj.time_modified = obj.TimeModified
             local_obj.save()
 
     def find_by_list_id(self, list_id, realm_id):

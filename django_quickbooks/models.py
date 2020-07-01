@@ -193,9 +193,9 @@ class Invoice(models.Model):
 
         def get_invoice_lines(invoice):
             invoice_lines = []
-            for charge in invoice.charges.all():
-                item_group = QBDItemService(ListID=charge.type.list_id if charge.type.list_id else '')
-                invoice_lines.append(QBDInvoiceLine(Item=item_group, Quantity=1.0, Rate=float(charge.rate)))
+            for invoice_line in invoice.invoice_lines.all():
+                item_group = QBDItemService(ListID=invoice_line.type.list_id if invoice_line.type.list_id else '')
+                invoice_lines.append(QBDInvoiceLine(Item=item_group, Quantity=1.0, Rate=float(invoice_line.rate)))
             return invoice_lines
 
         data = dict(
@@ -250,7 +250,6 @@ class ItemService(models.Model):
 
     @classmethod
     def from_qbd_obj(cls, qbd_obj, realm_id=None):
-        print()
         return cls(
             realm_id=realm_id,
             name=qbd_obj.Name,
@@ -296,7 +295,7 @@ class ExternalItemService(models.Model):
 
 class InvoiceLine(models.Model):
     id = models.UUIDField(primary_key=True, blank=True, editable=False, default=uuid4)
-    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='charges')
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='invoice_lines')
     realm = models.ForeignKey(Realm, on_delete=models.CASCADE, related_name='invoice_lines')
     type = models.ForeignKey(ItemService, on_delete=models.SET_NULL, null=True, related_name='invoice_charges')
     rate = models.DecimalField(decimal_places=2, max_digits=8)
