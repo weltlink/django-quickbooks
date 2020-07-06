@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  nginx:
+    image: nginx-proxy
+    build: nginx-proxy
+    env_file:
+      - .env
+    ports:
+    - 80:80
+    - 443:443
+    volumes:
+    - ./nginx-proxy/fullchain.pem:/etc/letsencrypt/live/${APP_HOST}/fullchain.pem
+    - ./nginx-proxy/privkey.pem:/etc/letsencrypt/live/${APP_HOST}/privkey.pem
+    - ./media:/app/media
+    - ./static:/app/static
+
+  redis:
+    image: bitnami/redis:5.0.9
+    hostname: redis
+    env_file:
+      - .env
+    ports:
+      - 6379:6379
+    environment:
+      REDIS_PASSWORD: ${REDIS_DEFAULT_PASSWORD}

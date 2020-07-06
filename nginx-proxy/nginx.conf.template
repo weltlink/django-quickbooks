@@ -1,0 +1,45 @@
+server {
+      listen      80;
+      server_name ${APP_HOST} *.${APP_HOST};
+
+      location / {
+        rewrite ^ https://${DOLLAR}host${DOLLAR}request_uri? permanent;
+      }
+}
+
+server {
+      listen      443 ssl;
+      server_name ${APP_HOST} *.${APP_HOST};
+
+      ssl_certificate      /etc/letsencrypt/live/${APP_HOST}/fullchain.pem;
+      ssl_certificate_key  /etc/letsencrypt/live/${APP_HOST}/privkey.pem;
+
+      client_max_body_size 50M;
+
+      # this is the internal Docker DNS, cache only for 30s
+      resolver 127.0.0.11 valid=30s;
+
+      location = /favicon.ico {
+        access_log off;
+        log_not_found off;
+      }
+
+      location /static/ {
+        alias /app/static/;
+      }
+
+      location /media/ {
+        alias /app/media/;
+      }
+
+      location / {
+        allow all;
+        proxy_http_version 1.1;
+        proxy_set_header X-Forwarded-For ${DOLLAR}proxy_add_x_forwarded_for;
+        proxy_set_header Host ${DOLLAR}http_host;
+        proxy_set_header X-Cluster-Client-Ip ${DOLLAR}remote_addr;
+
+        set ${DOLLAR}app_proxy ${APP_PROXY};
+        proxy_pass http://${DOLLAR}app_proxy;
+        }
+}

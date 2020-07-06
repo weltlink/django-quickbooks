@@ -4,10 +4,13 @@ from uuid import uuid4, uuid1
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.files import File
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.db import models
 from django.utils import timezone
+from jsonfield import JSONField
 from lxml import etree
 
 from django_quickbooks import qbwc_settings, QUICKBOOKS_ENUMS
@@ -31,7 +34,7 @@ from django_quickbooks.objects.invoice import Invoice as QBDInvoice
 
 class Realm(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid4)
-    schema_name = models.CharField(max_length=100, unique=True)
+    file = models.FileField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     name = models.CharField(max_length=155)
     password = models.CharField(max_length=128, null=True)
@@ -56,6 +59,16 @@ class Realm(models.Model):
 
         return check_password(raw_password, self.password, setter)
 
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if self.file.name is None:
+            self.file = ContentFile(create_qwc(self), name=self.generate_filename())
+        super().save(force_insert, force_update, using, update_fields)
+
+    def generate_filename(self, name=None):
+        if name is None:
+            name = str(uuid4())
+        file_ext = '%s.qwc' % name
+        return default_storage.generate_filename(file_ext)
 
 class RealmSession(models.Model):
     id = models.UUIDField(verbose_name='Ticket for QBWC session', primary_key=True, editable=False, default=uuid1)

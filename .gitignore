@@ -107,6 +107,11 @@ ENV/
 env.bak/
 venv.bak/
 
+# Django app for testing
+app/
+media/
+static/
+
 # Spyder project settings
 .spyderproject
 .spyproject
