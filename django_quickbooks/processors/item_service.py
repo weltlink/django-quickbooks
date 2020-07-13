@@ -28,7 +28,7 @@ class ItemServiceAddResponseProcessor(ResponseProcessor, ResponseProcessorMixin)
             if local_item_service:
                 self.update(local_item_service, item_service)
             else:
-                self.create(item_service)
+                self.create(item_service, realm.id)
         return True
 
 

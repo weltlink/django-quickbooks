@@ -40,6 +40,9 @@ class Service:
         xml = xml_setter('MaxReturned', 100)
         if resource == QUICKBOOKS_ENUMS.RESOURCE_ACCOUNT:
             xml = xml_setter(resource + QUICKBOOKS_ENUMS.OPP_QR + 'Rq', xml, metaData='NoMetaData')
+        elif resource == QUICKBOOKS_ENUMS.RESOURCE_INVOICE:
+            xml += xml_setter('IncludeLineItems', 'true')
+            xml = xml_setter(resource + QUICKBOOKS_ENUMS.OPP_QR + 'Rq', xml, metaData='NoMetaData', iterator='Start')
         else:
             xml = xml_setter(resource + QUICKBOOKS_ENUMS.OPP_QR + 'Rq', xml, metaData='NoMetaData', iterator='Start')
         return self._prepare_request(xml)

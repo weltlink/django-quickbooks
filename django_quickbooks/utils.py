@@ -1,10 +1,10 @@
 import random
 import string
 from importlib import import_module
+from itertools import groupby
 
 from django.utils.six import string_types
 
-from django_quickbooks.exceptions import QBItemServiceNotMapped
 from django_quickbooks.settings import import_from_string
 
 
@@ -47,33 +47,15 @@ def get_xml_meta_info():
 
 def random_string(length=10):
     letters = string.ascii_lowercase + string.ascii_uppercase
-    return ''.join(random.choice(letters) for i in range(length))
+    return ''.join(random.choice(letters) for _ in range(length))
 
 
-def convert_qbd_model_to_qbdtask(obj, qb_resource, qb_operation=None, **kwargs):
-    from django_quickbooks import QUICKBOOKS_ENUMS
-    from django.contrib.contenttypes.models import ContentType
-
-    if not qb_operation:
-        if obj.is_qbd_obj_created:
-            qb_operation = QUICKBOOKS_ENUMS.OPP_MOD
-        else:
-            qb_operation = QUICKBOOKS_ENUMS.OPP_ADD
-
-        return dict(
-            qb_operation=qb_operation,
-            qb_resource=qb_resource,
-            object_id=obj.id,
-            content_type=ContentType.objects.get_for_model(obj),
-        )
-
-
-def map_item_services_with_charge_types(mapped_items, realm_id):
+def map_item_services_with_external_item_services(mapped_items, realm_id):
     """
-    :param list of dict mapped_items: Map between external charge types and QBD item services. Example syntax:
+    :param list of dict mapped_items: Map between external item services and QBD item services. Example syntax:
         [
             {
-                'charge_id': uuid or another type of ID,
+                'external_id': uuid or another type of ID,
                 'service_id': QBD item service's ID
             }
         ]
@@ -84,47 +66,66 @@ def map_item_services_with_charge_types(mapped_items, realm_id):
 
     for item in mapped_items:
         item_service = ItemService.objects.get(id=item['service_id'], realm_id=realm_id)
-        item_service.external_item_service.create(external_item_service_id=item['charge_id'])
+        item_service.external_item_service.get_or_create(external_item_service_id=item['external_id'])
 
 
-def check_mapping(charge_ids, realm_id):
+def check_mapping(external_ids, realm_id):
     """
     Call this function before sending signal to create Invoice or InvoiceLine
-    :param list charge_ids: List of charge types IDs
+    :param list of str external_ids: List of charge types IDs
     :param str realm_id: Realm ID of the schema
     :return:
     """
+    from django_quickbooks.models import ExternalItemService
+
+    if any([not ExternalItemService.objects.filter(item_service__realm_id=realm_id,
+                                                   external_item_service_id=external_id)
+            for external_id in external_ids]):
+        return False
+
+    return True
+
+
+def get_mapped_services(external_ids, realm_id):
+    """
+    :param list of str external_ids: List of charge types IDs
+    :param str realm_id: Realm ID of the schema
+    :return: list of dict
+    """
+    from django_quickbooks.models import ExternalItemService
     from django_quickbooks.models import ItemService
 
-    if any([not ItemService.objects.filter(realm_id=realm_id, external_item_service__external_item_service_id=charge_id)
-            for charge_id in charge_ids]):
-        raise QBItemServiceNotMapped
+    def key(x):
+        return x.item_service.id
+
+    item_services = ExternalItemService.objects.filter(
+        item_service__realm_id=realm_id,
+        external_item_service_id__in=external_ids)
+
+    mapped_services = []
+    for item_service, group in groupby(sorted(item_services, key=key), key=key):
+        item_service = ItemService.objects.get(id=item_service)
+        mapped_services.append(dict(
+            external_ids=list(gr.external_item_service_id for gr in list(group)),
+            service_id=item_service.id.__str__(),
+            name=item_service.name,
+            full_name=item_service.full_name,
+            parent_id=item_service.parent_id,
+        ))
+
+    return mapped_services
 
 
-def filter_objects(realm_id, model, filter_by='ALL'):
+def synced_objects(realm_id, model):
     """
     :param str realm_id: Realm ID of the schema
     :param str model: Model name, e.g. Invoice or Customer
-    :param str filter_by: There are three types of filters: ALL, SYNC, NOT_SYNC
-        ALL - returns all objects;
-        SYNC - return objects, that were synchronized with Quickbooks;
-        NOT_SYNC - returns objects, that were added to django_quickbooks, but not sync with Quickbooks.
     :return: QuerySet of external objects IDs
     """
 
-    def parse_filter():
-        filter_params = dict(SYNC=False, NOT_SYNC=True)
-        return {
-            f'list_id__isnull': filter_params.get(filter_by, False),
-            'realm_id': realm_id
-        }
+    qbd_model = import_from_string(f'django_quickbooks.models.{model}', None)
 
-    filter_model = import_from_string(f'django_quickbooks.models.{model}', None)
-
-    if filter_by == 'ALL':
-        return filter_model.objects.filter(realm_id=realm_id).values_list('external_id', flat=True)
-
-    return filter_model.objects.filter(**parse_filter()).values_list('external_id', flat=True)
+    return qbd_model.objects.filter(list_id__isnull=False, realm_id=realm_id).values_list('external_id', flat=True)
 
 
 def get_time_created(realm_id, model, external_id):

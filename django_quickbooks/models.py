@@ -5,7 +5,6 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.files import File
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db import models
@@ -65,10 +64,9 @@ class Realm(models.Model):
         super().save(force_insert, force_update, using, update_fields)
 
     def generate_filename(self, name=None):
-        if name is None:
-            name = str(uuid4())
-        file_ext = '%s.qwc' % name
-        return default_storage.generate_filename(file_ext)
+        name = name or str(uuid4())
+        return default_storage.generate_filename('%s.qwc' % name)
+
 
 class RealmSession(models.Model):
     id = models.UUIDField(verbose_name='Ticket for QBWC session', primary_key=True, editable=False, default=uuid1)
@@ -124,6 +122,7 @@ class Customer(models.Model):
     full_name = models.CharField(max_length=100, null=True)
     name = models.CharField(max_length=41, null=True)
     is_active = models.BooleanField(default=True)
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
     time_created = models.DateTimeField(null=True)
     time_modified = models.DateTimeField(null=True)
     company_name = models.CharField(max_length=41, null=True)
@@ -169,13 +168,59 @@ class Customer(models.Model):
                 )
         return QBDCustomer(**data)
 
+    @classmethod
+    def from_qbd_obj(cls, qbd_obj, realm_id):
+        def get_addresses(obj):
+            return dict(
+                addresses={
+                    f'Addr{i}': getattr(obj, f'Addr{i}', '') for i in range(1, 6)
+                },
+                city=getattr(obj, 'City', ''),
+                state=getattr(obj, 'State', ''),
+                postal_code=getattr(obj, 'PostalCode', '')
+            )
+
+        parent_list_id = qbd_obj.Parent.ListID if getattr(qbd_obj, 'Parent') else None
+        parent = cls.objects.filter(list_id=parent_list_id, realm_id=realm_id).first() if parent_list_id else None
+
+        customer = cls(
+            realm_id=realm_id,
+            list_id=qbd_obj.ListID,
+            edit_sequence=qbd_obj.EditSequence,
+            name=qbd_obj.Name,
+            full_name=qbd_obj.FullName,
+            is_active=qbd_obj.IsActive,
+            parent=parent,
+            phone=qbd_obj.Phone,
+            alt_phone=qbd_obj.AltPhone,
+            fax=qbd_obj.Fax,
+            email=qbd_obj.Email,
+            contact=qbd_obj.Contact,
+            alt_contact=qbd_obj.AltContact,
+            time_created=qbd_obj.TimeCreated,
+            time_modified=qbd_obj.TimeModified,
+        )
+
+        customer.save()
+
+        bill_address = getattr(qbd_obj, 'BillAddress', None)
+        ship_address = getattr(qbd_obj, 'ShipAddress', None)
+
+        if bill_address:
+            BillAddress.objects.create(**get_addresses(bill_address), customer=customer)
+
+        if ship_address:
+            ShipAddress.objects.create(**get_addresses(ship_address), customer=customer)
+
+        return customer
+
 
 class Invoice(models.Model):
     id = models.UUIDField(primary_key=True, blank=True, editable=False, default=uuid4)
     realm = models.ForeignKey(Realm, on_delete=models.CASCADE, related_name='invoices')
     list_id = models.CharField(max_length=127, unique=True, null=True, editable=False)
     edit_sequence = models.CharField(max_length=127, null=True, editable=False)
-    customer = models.OneToOneField(Customer, on_delete=models.CASCADE, related_name='invoice')
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='invoice')
     time_created = models.DateTimeField(null=True)
     time_modified = models.DateTimeField(null=True)
     txn_date = models.DateField(null=True)
@@ -190,19 +235,23 @@ class Invoice(models.Model):
         return self.list_id and self.edit_sequence
 
     def to_qbd_obj(self, create=True, **fields):
-        def get_bill_address(invoice):
-            bill_address = dict(Addr1='', City='', State='', PostalCode='', Country='')
+        def get_addresses(address_type):
+            address_data = dict(Addr1='', City='', State='', PostalCode='', Country='')
 
-            if hasattr(invoice, 'billaddress'):
-                bill_address.update(
-                    Addr1=invoice.billaddress.addresses.get('Addr1', ''),
-                    City=invoice.billaddress.city or '',
-                    State=invoice.billaddress.state or '',
-                    PostalCode=str(invoice.billaddress.postal_code) or '',
-                    Country=invoice.billaddress.country or '',
+            address = getattr(self.customer, address_type, None)
+
+            if address:
+                address_data.update(
+                    **{
+                        key: value for key, value in address.addresses.items() if value
+                    },
+                    City=address.city or '',
+                    State=address.state or '',
+                    PostalCode=str(address.postal_code) or '',
+                    Country=address.country or '',
                 )
 
-            return QBDBillAddress(**bill_address)
+            return QBDBillAddress(**address_data)
 
         def get_invoice_lines(invoice):
             invoice_lines = []
@@ -213,7 +262,8 @@ class Invoice(models.Model):
 
         data = dict(
             Customer=self.customer.to_qbd_obj(**dict(ListID='list_id')),
-            BillAddress=get_bill_address(self),
+            BillAddress=get_addresses('billaddress'),
+            ShipAddress=get_addresses('shipaddress'),
             IsPending=self.is_pending,
             DueDate=self.due_date.isoformat(),
             InvoiceLine=get_invoice_lines(self),
@@ -228,6 +278,49 @@ class Invoice(models.Model):
 
         return QBDInvoice(**data)
 
+    @classmethod
+    def from_qbd_obj(cls, qbd_obj, realm_id):
+        try:
+            customer = Customer.objects.get(list_id=qbd_obj.Customer.ListID, realm_id=realm_id)
+        except ObjectDoesNotExist:
+            return None
+
+        invoice = cls(
+            realm_id=realm_id,
+            list_id=qbd_obj.TxnID,
+            edit_sequence=qbd_obj.EditSequence,
+            customer=customer,
+            time_created=qbd_obj.TimeCreated,
+            time_modified=qbd_obj.TimeModified,
+            txn_date=qbd_obj.TxnDate,
+            is_pending=qbd_obj.IsPending,
+            due_date=qbd_obj.DueDate,
+            memo=qbd_obj.Memo
+        )
+
+        invoice.save()
+
+        if qbd_obj.InvoiceLine:
+            invoice_lines = []
+            for invoice_line in qbd_obj.InvoiceLine:
+                item_service = ItemService.objects.filter(list_id=invoice_line.Item.ListID, realm_id=realm_id).first()
+                if not item_service:
+                    continue
+
+                invoice_lines.append(
+                    InvoiceLine(
+                        invoice=invoice,
+                        type=item_service,
+                        realm_id=realm_id,
+                        rate=invoice_line.Rate,
+                        note=invoice_line.Desc
+                    )
+                )
+
+            InvoiceLine.objects.bulk_create(invoice_lines)
+
+        return invoice
+
 
 class ItemService(models.Model):
     id = models.UUIDField(primary_key=True, blank=True, editable=False, default=uuid4)
@@ -235,6 +328,8 @@ class ItemService(models.Model):
     list_id = models.CharField(max_length=127, unique=True, null=True, editable=False)
     edit_sequence = models.CharField(max_length=127, null=True, editable=False)
     name = models.CharField(max_length=25, null=True, blank=True)
+    full_name = models.CharField(max_length=159, null=True)
+    parent_id = models.CharField(max_length=127, null=True)
     account = models.ForeignKey('ServiceAccount', on_delete=models.CASCADE, related_name='item_services')
     description = models.TextField(null=True, blank=True)
 
@@ -262,12 +357,15 @@ class ItemService(models.Model):
         return QBDItemService(**data)
 
     @classmethod
-    def from_qbd_obj(cls, qbd_obj, realm_id=None):
+    def from_qbd_obj(cls, qbd_obj, realm_id):
         return cls(
             realm_id=realm_id,
             name=qbd_obj.Name,
+            full_name=qbd_obj.FullName,
             list_id=qbd_obj.ListID,
-            esit_sequence=qbd_obj.EditSequence
+            edit_sequence=qbd_obj.EditSequence,
+            parent_id=qbd_obj.Parent.ListID if getattr(qbd_obj, 'Parent') else None,
+            account=ServiceAccount.objects.get(list_id=qbd_obj.SalesOrPurchase.Account.ListID, realm_id=realm_id),
         )
 
 
@@ -284,7 +382,7 @@ class ServiceAccount(models.Model):
     account_number = models.IntegerField(null=True)
 
     @classmethod
-    def from_qbd_obj(cls, qbd_obj, realm_id=None):
+    def from_qbd_obj(cls, qbd_obj, realm_id):
         return cls(
             realm_id=realm_id,
             name=qbd_obj.Name,
@@ -299,11 +397,11 @@ class ServiceAccount(models.Model):
 
 
 class ExternalItemService(models.Model):
-    charge_type = models.ForeignKey(ItemService, on_delete=models.CASCADE, related_name='external_item_service')
+    item_service = models.ForeignKey(ItemService, on_delete=models.CASCADE, related_name='external_item_service')
     external_item_service_id = models.CharField(max_length=36, null=False, blank=False)
 
     class Meta:
-        unique_together = ('charge_type', 'external_item_service_id')
+        unique_together = ('item_service', 'external_item_service_id')
 
 
 class InvoiceLine(models.Model):
@@ -317,7 +415,7 @@ class InvoiceLine(models.Model):
 
 
 class AbstractAddress(models.Model):
-    invoice = models.OneToOneField(Invoice, on_delete=models.CASCADE, related_name='%(class)s')
+    customer = models.OneToOneField(Customer, on_delete=models.CASCADE, related_name='%(class)s')
     addresses = JSONField(default=dict)
     city = models.CharField(max_length=31, null=True)
     state = models.CharField(max_length=21, null=True)

@@ -23,3 +23,4 @@ from django_quickbooks.signals.customer import *
 from django_quickbooks.signals.invoice import *
 from django_quickbooks.signals.qbd_task import *
 from django_quickbooks.signals.item_service import *
+from django_quickbooks.signals.connect import *

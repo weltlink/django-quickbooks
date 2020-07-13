@@ -44,6 +44,7 @@ class Invoice(BaseObject):
         DueDate=dict(validator=dict(type=SchemeValidator.STRTYPE)),
         Memo=dict(validator=dict(type=SchemeValidator.STRTYPE)),
         InvoiceLine=dict(many=True, validator=dict(type=SchemeValidator.OBJTYPE)),
+        IncludeLineItems=dict(validator=dict(type=SchemeValidator.BOOLTYPE)),
     )
 
     @staticmethod
@@ -60,10 +61,10 @@ class Txn(BaseObject):
 
     def as_xml(self, class_name=None, indent=0, opp_type=QUICKBOOKS_ENUMS.OPP_ADD,
                version=QUICKBOOKS_ENUMS.VERSION_13, **kwargs):
-        xml = super(Txn, self).as_xml(class_name, indent, opp_type, version,  **kwargs)
+        xml = super(Txn, self).as_xml(class_name, indent, opp_type, version, **kwargs)
 
-        return xml\
-            .replace(f'<{__class__.__name__}{opp_type}>', '')\
-            .replace(f'</{__class__.__name__}{opp_type}>', '')\
-            .replace('<TxnType>', f'<Txn{opp_type}Type>')\
+        return xml \
+            .replace(f'<{__class__.__name__}{opp_type}>', '') \
+            .replace(f'</{__class__.__name__}{opp_type}>', '') \
+            .replace('<TxnType>', f'<Txn{opp_type}Type>') \
             .replace('</TxnType>', f'</Txn{opp_type}Type>')

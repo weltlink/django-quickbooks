@@ -25,7 +25,7 @@ class CustomerQueryResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
             if local_customer:
                 self.update(local_customer, customer)
             else:
-                self.create(customer)
+                self.create(customer, realm.id)
         return True
 
 

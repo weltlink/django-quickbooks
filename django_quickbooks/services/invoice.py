@@ -6,7 +6,7 @@ from django_quickbooks.services.base import Service
 class InvoiceService(Service):
     ref_fields = ['Customer', 'Item']
     add_fields = ['InvoiceLine']
-    complex_fields = ['BillAddress']
+    complex_fields = ['BillAddress', 'ShipAddress', 'InvoiceLine']
     mod_fields = ['InvoiceLine']
 
     def add(self, object):

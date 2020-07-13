@@ -40,16 +40,17 @@ class Command(BaseCommand):
         except ObjectDoesNotExist:
             exit('Invalid or Not existing realm id')
 
-        app_name = input('app_name: Default[Weltlink TMS] ') or 'Weltlink TMS'
+        app_name = input('app_name: Default[Quickbooks] ') or 'Quickbooks'
         app_id = input('app_id: Default[] ') or ''
-        app_url = input('app_url: Default[http://localhost:8000/qwc/] ') or 'http://localhost:8000/qwc/'
-        app_desc = input('app_desc: Default[Weltlink TMS Description] ') or 'Weltlink TMS Description'
-        app_support = input(
-            'app_support: Default[http://localhost:8000/qwc/support/] ') or 'http://localhost:8000/qwc/support/'
+        app_url = input('app_url: Default[http://localhost:8000/quickbooks-desktop/] ') or \
+                  'http://localhost:8000/quickbooks-desktop/'
+        app_desc = input('app_desc: Default[Quickbooks Description] ') or 'Quickbooks Description'
+        app_support = input('app_support: Default[http://localhost:8000/quickbooks-desktop/support/] ') or \
+                      'http://localhost:8000/quickbooks-desktop/support/'
         owner_id = input(
-            'owner_id: Default[{55a9fd50-79e9-44e4-8fef-98411c2e8785}] ') or '{55a9fd50-79e9-44e4-8fef-98411c2e8785}'
+            'owner_id: Default[{%s}] ' % realm.id) or '{%s}' % realm.id
         file_id = input(
-            'file_id: Default[{30830c9c-c1b7-4773-a12d-b193437a8fef}] ') or '{30830c9c-c1b7-4773-a12d-b193437a8fef}'
+            'file_id: Default[{%s}] ' % realm.file) or '{%s}' % realm.file
         qb_type = input('qb_type: Default[QBFS] ') or 'QBFS'
         schedule_n_minutes = input('schedule_n_minutes: Default[15] ') or '15'
 

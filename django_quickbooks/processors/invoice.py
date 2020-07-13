@@ -52,6 +52,22 @@ class InvoiceModResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
 class InvoiceQueryResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
     local_model_class = Invoice
     obj_class = QBDInvoice
-
     resource = QUICKBOOKS_ENUMS.RESOURCE_INVOICE
     op_type = QUICKBOOKS_ENUMS.OPP_QR
+
+    def process(self, realm):
+        cont = super().process(realm)
+        if not cont:
+            return False
+
+        for invoice_ret in list(self._response_body):
+            invoice = self.obj_class.from_lxml(invoice_ret)
+            local_invoice = None
+
+            if invoice.TxnID:
+                local_invoice = self.find_by_list_id(invoice.TxnID, realm.id)
+
+            if not local_invoice:
+                self.create(invoice, realm.id)
+
+        return True

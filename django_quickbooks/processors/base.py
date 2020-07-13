@@ -1,5 +1,4 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils import timezone
 from django.utils.decorators import method_decorator
 from lxml import etree
 
@@ -84,6 +83,6 @@ class ResponseProcessorMixin:
         except ObjectDoesNotExist:
             return None
 
-    def create(self, obj, realm_id=None):
-        customer = self.local_model_class.from_qbd_obj(obj, realm_id=realm_id)
-        customer.save()
+    def create(self, obj, realm_id):
+        model_obj = self.local_model_class.from_qbd_obj(obj, realm_id)
+        model_obj and model_obj.save()

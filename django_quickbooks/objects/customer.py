@@ -11,6 +11,7 @@ class Customer(BaseObject):
         Name=dict(required=False, validator=dict(type=SchemeValidator.STRTYPE)),
         FullName=dict(required=True, validator=dict(type=SchemeValidator.STRTYPE)),
         IsActive=dict(validator=dict(type=SchemeValidator.BOOLTYPE)),
+        Parent=dict(validator=dict(type=SchemeValidator.OBJTYPE)),
         CompanyName=dict(validator=dict(type=SchemeValidator.STRTYPE)),
         BillAddress=dict(validator=dict(type=SchemeValidator.OBJTYPE)),
         ShipAddress=dict(validator=dict(type=SchemeValidator.OBJTYPE)),
