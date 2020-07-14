@@ -14,7 +14,7 @@ DEFAULTS = {
     'REALM_MODEL_CLASS': 'django_quickbooks.models.Realm',
     'REALM_SESSION_MODEL_CLASS': 'django_quickbooks.models.RealmSession',
     'QBD_TASK_MODEL_CLASS': 'django_quickbooks.models.QBDTask',
-    
+
     'REALM_CONNECTION_DECORATOR': 'django_quickbooks.decorators.base_realm_connection',
 
     'RESPONSE_PROCESSORS': (
@@ -47,6 +47,8 @@ DEFAULTS = {
     'APP_DESCRIPTION': 'Some App Description',
     'QB_TYPE': 'QBFS',
     'OWNER_ID': '{1ee58da6-3051-11ea-b499-9cda3ea7afc1}',
+
+    'QWC_PATH': 'qwc'
 }
 
 IMPORT_STRINGS = (

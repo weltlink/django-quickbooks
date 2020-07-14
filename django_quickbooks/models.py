@@ -30,15 +30,21 @@ from django_quickbooks.objects.invoice import Invoice as QBDInvoice
 
 # NOTICE: you also find decorators in the package that only work with django-tenant-schemas
 
+def file_path(file, name):
+    return '%s/%s' % (qbwc_settings.QWC_PATH, name)
+
 
 class Realm(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid4)
-    file = models.FileField(null=True, blank=True)
+    file = models.FileField(null=True, blank=True, upload_to=file_path)
     is_active = models.BooleanField(default=True)
     name = models.CharField(max_length=155)
     password = models.CharField(max_length=128, null=True)
 
     objects = RealmQuerySet.as_manager()
+
+    def __str__(self):
+        return self.name
 
     def set_password(self, raw_password):
         self.password = make_password(raw_password)
@@ -75,6 +81,9 @@ class RealmSession(models.Model):
     ended_at = models.DateTimeField(null=True)
 
     objects = RealmSessionQuerySet.as_manager()
+
+    def __str__(self):
+        return self.realm.name
 
     def close(self):
         self.ended_at = timezone.now()
@@ -137,6 +146,9 @@ class Customer(models.Model):
 
     class Meta:
         unique_together = ('name', 'realm')
+
+    def __str__(self):
+        return self.name
 
     @property
     def is_qbd_obj_created(self):
@@ -224,7 +236,7 @@ class Invoice(models.Model):
     time_created = models.DateTimeField(null=True)
     time_modified = models.DateTimeField(null=True)
     txn_date = models.DateField(null=True)
-    is_pending = models.BooleanField(null=True)
+    is_pending = models.BooleanField(null=True, default=True)
     due_date = models.DateField(null=True)
     memo = models.TextField(null=True, max_length=4095)
     external_id = models.CharField(max_length=36, null=True)
@@ -336,6 +348,9 @@ class ItemService(models.Model):
     class Meta:
         unique_together = ('name', 'realm')
 
+    def __str__(self):
+        return self.name
+
     @property
     def is_qbd_obj_created(self):
         return self.list_id and self.edit_sequence
@@ -380,6 +395,9 @@ class ServiceAccount(models.Model):
     parent_id = models.CharField(max_length=127, null=True, editable=False)
     account_type = models.CharField(max_length=100, null=True)
     account_number = models.IntegerField(null=True)
+
+    def __str__(self):
+        return self.name
 
     @classmethod
     def from_qbd_obj(cls, qbd_obj, realm_id):

@@ -66,6 +66,14 @@ def sample_invoice_add_xml():
                     <Country>United States</Country>
                     <Note>Nice address</Note>
                 </BillAddress>
+                <ShipAddress>
+                    <Addr1>2305 Litton Ln</Addr1>
+                    <City>Hebron</City>
+                    <State>Kentucky</State>
+                    <PostalCode>41048</PostalCode>
+                    <Country>United States</Country>
+                    <Note>Nice address</Note>
+                </ShipAddress>
                 <IsPending>true</IsPending>
                 <DueDate>2018-03-24T00:31:04+05:00</DueDate>
                 <Memo>a2e8929f-6f03-4bc2-ad27-ea6aa2cc11cd</Memo>
@@ -140,6 +148,14 @@ def sample_invoice_mod_xml():
                     <Country>United States</Country>
                     <Note>Nice address</Note>
                 </BillAddress>
+                <ShipAddress>
+                    <Addr1>2305 Litton Ln</Addr1>
+                    <City>Hebron</City>
+                    <State>Kentucky</State>
+                    <PostalCode>41048</PostalCode>
+                    <Country>United States</Country>
+                    <Note>Nice address</Note>
+                </ShipAddress>
                 <IsPending>true</IsPending>
                 <DueDate>2018-03-24T00:31:04+05:00</DueDate>
                 <Memo>a2e8929f-6f03-4bc2-ad27-ea6aa2cc11cd</Memo>
@@ -185,6 +201,7 @@ def sample_invoice_query_all_xml():
             <QBXMLMsgsRq onError="stopOnError">
                 <InvoiceQueryRq metaData="NoMetaData" iterator="Start">
                     <MaxReturned>100</MaxReturned>
+                    <IncludeLineItems>true</IncludeLineItems>
                 </InvoiceQueryRq>
             </QBXMLMsgsRq>
         </QBXML>
