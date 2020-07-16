@@ -21,6 +21,7 @@ from django_quickbooks.objects.account import SalesOrPurchase  as QBDSalesOrPurc
 from django_quickbooks.objects.address import BillAddress as QBDBillAddress
 from django_quickbooks.objects.customer import Customer as QBDCustomer
 from django_quickbooks.objects.invoice import Invoice as QBDInvoice
+from django_quickbooks.querysets import ExternalItemServiceManager
 
 
 # Below models are concrete implementations of above classes
@@ -38,7 +39,7 @@ class Realm(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid4)
     file = models.FileField(null=True, blank=True, upload_to=file_path)
     is_active = models.BooleanField(default=True)
-    name = models.CharField(max_length=155)
+    name = models.CharField(max_length=155, unique=True)
     password = models.CharField(max_length=128, null=True)
 
     objects = RealmQuerySet.as_manager()
@@ -417,6 +418,8 @@ class ServiceAccount(models.Model):
 class ExternalItemService(models.Model):
     item_service = models.ForeignKey(ItemService, on_delete=models.CASCADE, related_name='external_item_service')
     external_item_service_id = models.CharField(max_length=36, null=False, blank=False)
+
+    object = ExternalItemServiceManager.as_manager()
 
     class Meta:
         unique_together = ('item_service', 'external_item_service_id')

@@ -43,15 +43,16 @@ def create_qbd_invoice(sender, model_obj, realm_id, customer_name, customer_id, 
         )
     )
 
-    invoice = Invoice.objects.create(
-        customer=customer,
-        is_pending=is_pending,
-        due_date=due_date,
+    invoice, created = Invoice.objects.get_or_create(
         external_id=model_obj.id,
         realm_id=realm_id,
-    )
+        defaults=dict(
+            customer=customer,
+            is_pending=is_pending,
+            due_date=due_date,
+        ))
 
-    if isinstance(invoice_lines, list):
+    if isinstance(invoice_lines, list) and created:
         creations = []
         for invoice_line in invoice_lines:
             item_service = ItemService.objects.get(

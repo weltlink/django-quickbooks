@@ -55,18 +55,22 @@ def map_item_services_with_external_item_services(mapped_items, realm_id):
     :param list of dict mapped_items: Map between external item services and QBD item services. Example syntax:
         [
             {
-                'external_id': uuid or another type of ID,
+                'external_ids': list of uuid or another type of ID,
                 'service_id': QBD item service's ID
             }
         ]
     :param str realm_id: Realm ID of the schema
     :return:
     """
-    from django_quickbooks.models import ItemService
+    from django_quickbooks.models import ItemService, ExternalItemService
 
-    for item in mapped_items:
-        item_service = ItemService.objects.get(id=item['service_id'], realm_id=realm_id)
-        item_service.external_item_service.get_or_create(external_item_service_id=item['external_id'])
+    for obj in mapped_items:
+        item_service = ItemService.objects.get(id=obj['service_id'], realm_id=realm_id)
+        ExternalItemService.object.set(
+            realm_id=realm_id,
+            item_service=item_service,
+            external_item_service_ids=obj['external_ids']
+        )
 
 
 def check_mapping(external_ids, realm_id):
@@ -74,7 +78,7 @@ def check_mapping(external_ids, realm_id):
     Call this function before sending signal to create Invoice or InvoiceLine
     :param list of str external_ids: List of charge types IDs
     :param str realm_id: Realm ID of the schema
-    :return:
+    :return: bool
     """
     from django_quickbooks.models import ExternalItemService
 
@@ -120,12 +124,13 @@ def synced_objects(realm_id, model):
     """
     :param str realm_id: Realm ID of the schema
     :param str model: Model name, e.g. Invoice or Customer
-    :return: QuerySet of external objects IDs
+    :return: List of str of external objects IDs
     """
 
     qbd_model = import_from_string(f'django_quickbooks.models.{model}', None)
+    qbd_objects = qbd_model.objects.filter(list_id__isnull=False, realm_id=realm_id)
 
-    return qbd_model.objects.filter(list_id__isnull=False, realm_id=realm_id).values_list('external_id', flat=True)
+    return [str(qbd_object.external_id) for qbd_object in qbd_objects]
 
 
 def get_time_created(realm_id, model, external_id):
@@ -133,7 +138,7 @@ def get_time_created(realm_id, model, external_id):
     :param str realm_id: Realm ID of the schema
     :param str model: Model name, e.g. Invoice or Customer
     :param str external_id: External object ID of Invoice or Customer
-    :return:
+    :return: Datetime or None
     """
     qbd_model = import_from_string(f'django_quickbooks.models.{model}', None)
 
@@ -147,7 +152,7 @@ def get_time_modified(realm_id, model, external_id):
     :param str realm_id: Realm ID of the schema
     :param str model: Model name, e.g. Invoice or Customer
     :param str external_id: External object ID of Invoice or Customer
-    :return:
+    :return: Datetime or None
     """
     qbd_model = import_from_string(f'django_quickbooks.models.{model}', None)
 
