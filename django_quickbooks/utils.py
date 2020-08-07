@@ -66,7 +66,7 @@ def map_item_services_with_external_item_services(mapped_items, realm_id):
 
     for obj in mapped_items:
         item_service = ItemService.objects.get(id=obj['service_id'], realm_id=realm_id)
-        ExternalItemService.object.set(
+        ExternalItemService.objects.set(
             realm_id=realm_id,
             item_service=item_service,
             external_item_service_ids=obj['external_ids']
@@ -159,3 +159,17 @@ def get_time_modified(realm_id, model, external_id):
     obj = qbd_model.objects.filter(external_id=external_id, realm_id=realm_id).first()
 
     return obj.time_modified if obj else None
+
+
+def get_external_updated_at(realm_id, model, external_id):
+    """
+    :param str realm_id: Realm ID of the schema
+    :param str model: Model name, e.g. Invoice or Customer
+    :param str external_id: External object ID of Invoice or Customer
+    :return: Datetime or None
+    """
+    qbd_model = import_from_string(f'django_quickbooks.models.{model}', None)
+
+    obj = qbd_model.objects.filter(external_id=external_id, realm_id=realm_id).first()
+
+    return obj.external_updated_at if obj else None

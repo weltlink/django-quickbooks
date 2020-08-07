@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
 
 from django_quickbooks import get_realm_model, QUICKBOOKS_ENUMS
 from django_quickbooks.models import Invoice, Customer, InvoiceLine, ItemService
@@ -10,11 +11,11 @@ RealmModel = get_realm_model()
 
 
 @receiver(invoice_created)
-def create_qbd_invoice(sender, model_obj, realm_id, customer_name, customer_id, invoice_lines=None,
-                       is_pending=True, due_date=None, *args, **kwargs):
+def create_qbd_invoice(sender, model_obj_id, realm_id, customer_name, customer_id, invoice_lines=None,
+                       is_pending=True, due_date=None, updated_at=None, *args, **kwargs):
     """
     :param object sender: Sender model
-    :param Invoice model_obj: Invoice object
+    :param str model_obj_id: External Invoice object ID
     :param str realm_id: Realm ID of the schema
     :param str customer_name: Customer's name to whom Invoice belonged
     :param srt customer_id: Customer's ID
@@ -23,33 +24,37 @@ def create_qbd_invoice(sender, model_obj, realm_id, customer_name, customer_id, 
         [
             {
                 'charge_id': uuid or another type of ID,
-                'amount': 1278.42,
+                'rate': 1278.42,
                 'type_id': uuid or another type of ID,
                 'name': 'FUEL',
             }
         ]
     :param bool is_pending: Is Invoice pending to be payed or not
     :param date due_date: Invoice DUE date
+    :param datetime updated_at: Invoice last time updated
     :param list args: args
     :param dict kwargs: kwargs
     :return:
     """
 
     customer, _ = Customer.objects.get_or_create(
-        name=customer_name,
+        full_name=customer_name,
         realm_id=realm_id,
         defaults=dict(
-            external_id=customer_id
+            name=customer_name.split(':')[-1],
+            external_id=customer_id,
+            external_updated_at=timezone.now(),
         )
     )
 
     invoice, created = Invoice.objects.get_or_create(
-        external_id=model_obj.id,
+        external_id=model_obj_id,
         realm_id=realm_id,
         defaults=dict(
             customer=customer,
             is_pending=is_pending,
             due_date=due_date,
+            external_updated_at=updated_at or timezone.now(),
         ))
 
     if isinstance(invoice_lines, list) and created:
@@ -62,19 +67,57 @@ def create_qbd_invoice(sender, model_obj, realm_id, customer_name, customer_id, 
                 invoice=invoice,
                 realm_id=realm_id,
                 type=item_service,
-                rate=invoice_line['amount'],
+                rate=invoice_line['rate'],
                 external_id=invoice_line['charge_id']
             ))
         InvoiceLine.objects.bulk_create(creations)
 
 
 @receiver(invoice_updated)
-def update_qbd_invoice(sender, model_obj, realm_id, is_pending, *args, **kwargs):
-    invoice = Invoice.objects.filter(external_id=model_obj.id, realm_id=realm_id).first()
+def update_qbd_invoice(sender, model_obj_id, realm_id, is_pending, updated_at=None, invoice_lines=None,
+                       *args, **kwargs):
+    """
+    :param object sender: Sender Model
+    :param str model_obj_id: External Invoice object ID
+    :param str realm_id: Realm ID of the schema
+    :param bool is_pending: Is Invoice pending to be payed or not
+    :param datetime updated_at: Invoice last time updated
+    :param list of dict invoice_lines: To match this syntax of dict, need to divide charge model into two models.
+        First is for charges itself, another is to keep their types through the ForeignKey field.
+        [
+            {
+                'charge_id': uuid or another type of ID,
+                'rate': 1278.42,
+                'type_id': uuid or another type of ID,
+                'name': 'FUEL',
+            }
+        ]
+    :param list args: args
+    :param dict kwargs: kwargs
+    :return:
+    """
+
+    invoice = Invoice.objects.filter(external_id=model_obj_id, realm_id=realm_id).first()
 
     if invoice:
         invoice.is_pending = is_pending
+        invoice.external_updated_at = updated_at or timezone.now()
         invoice.save()
+
+        if isinstance(invoice_lines, list):
+            for invoice_line in invoice_lines:
+                item_service = ItemService.objects.get(
+                    realm_id=realm_id,
+                    external_item_service__external_item_service_id=invoice_line['type_id'])
+                InvoiceLine.objects.get_or_create(
+                    invoice=invoice,
+                    realm_id=realm_id,
+                    external_id=invoice_line['charge_id'],
+                    defaults=dict(
+                        type=item_service,
+                        rate=invoice_line['rate']
+                    )
+                )
 
 
 @receiver(invoice_deleted)
@@ -91,8 +134,6 @@ def delete_qbd_invoice(sender, model_obj_id, realm_id, *args, **kwargs):
             realm_id=realm_id,
         )
 
-        invoice.delete()
-
 
 @receiver(post_save, sender=Invoice)
 def create_invoice(sender, instance: Invoice, raw, created, *args, **kwargs):
@@ -105,7 +146,7 @@ def create_invoice(sender, instance: Invoice, raw, created, *args, **kwargs):
             content_type=ContentType.objects.get_for_model(Invoice),
             realm_id=instance.realm.id
         )
-    else:
+    elif not created and not kwargs.get('update_fields', None):
         qbd_task_create.send(
             sender=Invoice,
             qb_operation=QUICKBOOKS_ENUMS.OPP_MOD,

@@ -4,6 +4,7 @@ from spyne.server.django import DjangoView
 
 from django_quickbooks.views import QuickBooksService, Support
 from django_quickbooks.views.account import AccountView
+from django_quickbooks.views.customer import CustomerView
 from django_quickbooks.views.item_service import ItemServiceView
 
 urlpatterns = [
@@ -16,4 +17,5 @@ urlpatterns = [
          ),
     path('quickbooks-desktop/accounts/', AccountView.as_view()),
     path('quickbooks-desktop/item-services/', ItemServiceView.as_view()),
+    path('quickbooks-deskuop/customers/', CustomerView.as_view()),
 ]

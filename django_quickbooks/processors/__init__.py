@@ -9,7 +9,8 @@ from django_quickbooks.processors.customer import \
 from django_quickbooks.processors.invoice import \
     InvoiceQueryResponseProcessor, \
     InvoiceAddResponseProcessor, \
-    InvoiceModResponseProcessor
+    InvoiceModResponseProcessor, \
+    InvoiceVoidResponseProcessor
 
 from django_quickbooks.processors.item_service import \
     ItemServiceQueryResponseProcessor, \

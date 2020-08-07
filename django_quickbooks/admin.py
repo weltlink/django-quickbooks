@@ -68,7 +68,7 @@ class ServiceAccountAdmin(admin.ModelAdmin):
         return False
 
     def has_delete_permission(self, request, obj=None):
-        return False
+        return request.user.is_superuser
 
     def has_change_permission(self, request, obj=None):
         return False
@@ -80,7 +80,7 @@ class ItemServiceAdmin(admin.ModelAdmin):
     list_filter = ['realm']
 
     def has_delete_permission(self, request, obj=None):
-        return False
+        return request.user.is_superuser
 
     def has_change_permission(self, request, obj=None):
         return False

@@ -9,7 +9,7 @@ from django_quickbooks.signals import qbd_task_create, item_service_deleted
 
 @receiver(post_save, sender=ItemService)
 def create_qbd_item_service(sender, instance: ItemService, raw, created, *args, **kwargs):
-    if created:
+    if created and not instance.list_id:
         qbd_task_create.send(
             sender=ItemService,
             qb_operation=QUICKBOOKS_ENUMS.OPP_ADD,

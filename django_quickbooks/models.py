@@ -146,7 +146,7 @@ class Customer(models.Model):
     external_updated_at = models.DateTimeField(null=True)
 
     class Meta:
-        unique_together = ('name', 'realm')
+        unique_together = ('full_name', 'realm')
 
     def __str__(self):
         return self.name
@@ -183,6 +183,9 @@ class Customer(models.Model):
 
     @classmethod
     def from_qbd_obj(cls, qbd_obj, realm_id):
+        # This method returns None instead of object. I did this to prevent double post_save signal call,
+        # because object was saved before to create some related parts.
+
         def get_addresses(obj):
             return dict(
                 addresses={
@@ -225,7 +228,7 @@ class Customer(models.Model):
         if ship_address:
             ShipAddress.objects.create(**get_addresses(ship_address), customer=customer)
 
-        return customer
+        return None
 
 
 class Invoice(models.Model):
@@ -270,7 +273,17 @@ class Invoice(models.Model):
             invoice_lines = []
             for invoice_line in invoice.invoice_lines.all():
                 item_group = QBDItemService(ListID=invoice_line.type.list_id if invoice_line.type.list_id else '')
-                invoice_lines.append(QBDInvoiceLine(Item=item_group, Quantity=1.0, Rate=float(invoice_line.rate)))
+                invoice_line_data = dict(
+                    Item=item_group,
+                    Quantity=1.0,
+                    Rate=float(invoice_line.rate),
+                    Desc=str(invoice_line.id),
+                )
+                if invoice_line.txn_line_id:
+                    invoice_line_data.update(
+                        **dict(TxnLineID=invoice_line.txn_line_id)
+                    )
+                invoice_lines.append(QBDInvoiceLine(**invoice_line_data))
             return invoice_lines
 
         data = dict(
@@ -280,6 +293,7 @@ class Invoice(models.Model):
             IsPending=self.is_pending,
             DueDate=self.due_date.isoformat(),
             InvoiceLine=get_invoice_lines(self),
+            Memo=str(self.id),
         )
         if self.is_qbd_obj_created:
             data.update(
@@ -293,6 +307,9 @@ class Invoice(models.Model):
 
     @classmethod
     def from_qbd_obj(cls, qbd_obj, realm_id):
+        # This method returns None instead of object. I did this to prevent double post_save signal call,
+        # because object was saved before to create some related parts.
+
         try:
             customer = Customer.objects.get(list_id=qbd_obj.Customer.ListID, realm_id=realm_id)
         except ObjectDoesNotExist:
@@ -332,7 +349,7 @@ class Invoice(models.Model):
 
             InvoiceLine.objects.bulk_create(invoice_lines)
 
-        return invoice
+        return None
 
 
 class ItemService(models.Model):
@@ -419,7 +436,7 @@ class ExternalItemService(models.Model):
     item_service = models.ForeignKey(ItemService, on_delete=models.CASCADE, related_name='external_item_service')
     external_item_service_id = models.CharField(max_length=36, null=False, blank=False)
 
-    object = ExternalItemServiceManager.as_manager()
+    objects = ExternalItemServiceManager.as_manager()
 
     class Meta:
         unique_together = ('item_service', 'external_item_service_id')
@@ -428,6 +445,7 @@ class ExternalItemService(models.Model):
 class InvoiceLine(models.Model):
     id = models.UUIDField(primary_key=True, blank=True, editable=False, default=uuid4)
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='invoice_lines')
+    txn_line_id = models.CharField(max_length=127, unique=True, null=True, editable=False)
     realm = models.ForeignKey(Realm, on_delete=models.CASCADE, related_name='invoice_lines')
     type = models.ForeignKey(ItemService, on_delete=models.SET_NULL, null=True, related_name='invoice_charges')
     rate = models.DecimalField(decimal_places=2, max_digits=8)

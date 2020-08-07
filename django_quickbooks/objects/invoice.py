@@ -55,8 +55,8 @@ class Invoice(BaseObject):
 
 class Txn(BaseObject):
     fields = dict(
-        TxnID=dict(validator=dict(type=SchemeValidator.IDTYPE)),
         TxnType=dict(validator=dict(type=SchemeValidator.STRTYPE)),
+        TxnID=dict(validator=dict(type=SchemeValidator.IDTYPE)),
     )
 
     def as_xml(self, class_name=None, indent=0, opp_type=QUICKBOOKS_ENUMS.OPP_ADD,

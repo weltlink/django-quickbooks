@@ -24,6 +24,7 @@ DEFAULTS = {
         'django_quickbooks.processors.InvoiceQueryResponseProcessor',
         'django_quickbooks.processors.InvoiceAddResponseProcessor',
         'django_quickbooks.processors.InvoiceModResponseProcessor',
+        'django_quickbooks.processors.InvoiceVoidResponseProcessor',
         'django_quickbooks.processors.ItemServiceQueryResponseProcessor',
         'django_quickbooks.processors.ItemServiceAddResponseProcessor',
         'django_quickbooks.processors.ItemServiceModResponseProcessor',
@@ -122,10 +123,6 @@ class QBWCSettings(object):
         # Coerce import strings into classes
         if attr in self.import_strings:
             val = perform_import(val, attr)
-
-        if attr == 'LOCAL_MODEL_CLASSES':
-            for key, value in val.items():
-                val[key] = import_from_string(value, value)
 
         setattr(self, attr, val)
         return val

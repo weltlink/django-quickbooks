@@ -19,14 +19,25 @@ class CustomerQueryResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
             local_customer = None
             if customer.ListID:
                 local_customer = self.find_by_list_id(customer.ListID, realm.id)
-            if not local_customer and customer.Name:
-                local_customer = self.find_by_name(customer.Name, realm.id)
+            if not local_customer and customer.FullName:
+                local_customer = self.find_by_name(customer.FullName, realm.id, field_name='full_name')
 
             if local_customer:
                 self.update(local_customer, customer)
             else:
                 self.create(customer, realm.id)
         return True
+
+    def update(self, local_obj, obj):
+        if local_obj.edit_sequence != obj.EditSequence:
+            local_obj.name = obj.Name
+            local_obj.full_name = obj.FullName
+            local_obj.list_id = obj.ListID
+            local_obj.edit_sequence = obj.EditSequence
+            local_obj.time_created = obj.TimeCreated
+            local_obj.time_modified = obj.TimeModified
+            local_obj.save(
+                update_fields=['name', 'full_name', 'list_id', 'edit_sequence', 'time_created', 'time_modified'])
 
 
 class CustomerAddResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
@@ -42,12 +53,20 @@ class CustomerAddResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
         for customer_ret in list(self._response_body):
             customer = self.obj_class.from_lxml(customer_ret)
             local_customer = None
-            if customer.Name:
-                local_customer = self.find_by_name(customer.Name, realm.id)
+            if customer.FullName:
+                local_customer = self.find_by_name(customer.FullName, realm.id, field_name='full_name')
 
             if local_customer:
                 self.update(local_customer, customer)
         return True
+
+    def update(self, local_obj, obj):
+        if local_obj.edit_sequence != obj.EditSequence:
+            local_obj.list_id = obj.ListID
+            local_obj.edit_sequence = obj.EditSequence
+            local_obj.time_created = obj.TimeCreated
+            local_obj.time_modified = obj.TimeModified
+            local_obj.save(update_fields=['list_id', 'edit_sequence', 'time_created', 'time_modified'])
 
 
 class CustomerModResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
@@ -65,9 +84,20 @@ class CustomerModResponseProcessor(ResponseProcessor, ResponseProcessorMixin):
             local_customer = None
             if customer.ListID:
                 local_customer = self.find_by_list_id(customer.ListID, realm.id)
-            elif not local_customer and customer.Name:
-                local_customer = self.find_by_name(customer.Name, realm.id)
+            elif not local_customer and customer.FullName:
+                local_customer = self.find_by_name(customer.FullName, realm.id, field_name='full_name')
 
             if local_customer:
                 self.update(local_customer, customer)
         return True
+
+    def update(self, local_obj, obj):
+        if local_obj.edit_sequence != obj.EditSequence:
+            local_obj.name = obj.Name
+            local_obj.full_name = obj.FullName
+            local_obj.list_id = obj.ListID
+            local_obj.edit_sequence = obj.EditSequence
+            local_obj.time_created = obj.TimeCreated
+            local_obj.time_modified = obj.TimeModified
+            local_obj.save(
+                update_fields=['name', 'full_name', 'list_id', 'edit_sequence', 'time_created', 'time_modified'])

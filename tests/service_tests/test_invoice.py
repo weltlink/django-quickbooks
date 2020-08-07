@@ -241,8 +241,8 @@ def sample_invoice_void_xml():
 <QBXML>
     <QBXMLMsgsRq onError="stopOnError">
         <TxnVoidRq>
-            <TxnID>800004ED-1525972764</TxnID>
             <TxnVoidType>Invoice</TxnVoidType>
+            <TxnID>800004ED-1525972764</TxnID>
         </TxnVoidRq>
     </QBXMLMsgsRq>
 </QBXML>
@@ -260,8 +260,8 @@ def sample_invoice_delete_xml():
 <QBXML>
     <QBXMLMsgsRq onError="stopOnError">
         <TxnDelRq>
-            <TxnID>800004ED-1525972764</TxnID>
             <TxnDelType>Invoice</TxnDelType>
+            <TxnID>800004ED-1525972764</TxnID>
         </TxnDelRq>
     </QBXMLMsgsRq>
 </QBXML>
